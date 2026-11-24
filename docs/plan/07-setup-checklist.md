@@ -14,7 +14,7 @@ Tick these off as you go. Never commit or paste keys, tokens or the DB password 
 - [ ] Note the **project ref** (from the dashboard URL or Project Settings → General)
 - [ ] Note the **project URL** `https://<ref>.supabase.co` (Project Settings → API)
 - [ ] Note the **anon/publishable key** (Project Settings → API Keys). Public, safe for the frontend
-- [ ] Generate an **access token** (Account → Access Tokens), name it `github-actions`
+- [ ] Generate an **access token** (Account → Access Tokens), name it `github-actions`. It must have scopes for **Edge Functions (read/write)**, **Projects (read)** and **Database/migrations**, otherwise `functions deploy` fails with `Missing required permission(s): edge_functions_write`. Tokens can't be edited, so create a new one if a scope is missing.
 - [ ] Leave Database/Auth settings alone: migrations will configure everything
 
 ## Phase 3: Brevo

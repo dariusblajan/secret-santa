@@ -3,6 +3,17 @@
     "title": "Secret Santa",
     "tagline": "Schimb de cadouri privat, între prieteni"
   },
+  "common": {
+    "save": "Salvează",
+    "saving": "Se salvează…",
+    "cancel": "Anulează",
+    "edit": "Modifică",
+    "copy": "Copiază linkul",
+    "copied": "Copiat!",
+    "loading": "Se încarcă…",
+    "backHome": "Înapoi acasă",
+    "tryAgain": "Încearcă din nou"
+  },
   "language": {
     "label": "Limbă",
     "en": "English",
@@ -11,7 +22,7 @@
   "home": {
     "welcome": "Bine ai venit!",
     "intro": "Creează o petrecere, invită-ți prietenii și lasă extragerea să decidă cine cumpără cadou pentru cine.",
-    "comingSoon": "Crearea petrecerii vine în iterația următoare."
+    "create": "Creează o petrecere"
   },
   "health": {
     "title": "Starea serverului",
@@ -19,6 +30,88 @@
     "ok": "Serverul este accesibil",
     "error": "Serverul nu este accesibil",
     "notConfigured": "Serverul nu este configurat (lipsesc variabilele de mediu)"
+  },
+  "create": {
+    "title": "Creează o petrecere",
+    "accessCode": "Cod de acces",
+    "accessCodeHint": "Cere codul persoanei care administrează aplicația.",
+    "submit": "Salvează petrecerea"
+  },
+  "party": {
+    "details": "Detaliile petrecerii",
+    "name": "Numele petrecerii",
+    "date": "Data",
+    "time": "Ora",
+    "timeHint": "Ora României",
+    "location": "Locație",
+    "locationHint": "Doar numele locului, de exemplu „Café Roma”",
+    "budget": "Buget (opțional)",
+    "budgetPlaceholder": "100",
+    "language": "Limba emailurilor",
+    "languageHint": "Invitațiile și reminderele se trimit în această limbă. Moneda bugetului o urmează.",
+    "currencyEn": "USD",
+    "currencyRo": "RON"
+  },
+  "participants": {
+    "title": "Participanți",
+    "counter": "{{count}} / {{max}}",
+    "you": "Tu (organizator)",
+    "name": "Nume",
+    "email": "Email",
+    "gender": "Gen (opțional)",
+    "genderNone": "—",
+    "girl": "Fată",
+    "boy": "Băiat",
+    "add": "Adaugă participant",
+    "remove": "Șterge participantul",
+    "minHint": "Ai nevoie de cel puțin {{min}} participanți (inclusiv tu) ca să pornești extragerea."
+  },
+  "manage": {
+    "created": "Petrecerea ta a fost creată!",
+    "linkTitle": "Linkul tău privat de organizator",
+    "linkHelp": "Salvează acest link: este singura cale de a administra petrecerea.",
+    "emailSent": "Ți l-am trimis și pe email.",
+    "emailNotSent": "Nu am putut trimite linkul pe email, așa că te rugăm să îl copiezi acum.",
+    "statusDraft": "Neînceput",
+    "statusDrawn": "Extragere făcută",
+    "participantsHeading_one": "{{count}} participant",
+    "participantsHeading_few": "{{count}} participanți",
+    "participantsHeading_other": "{{count}} de participanți",
+    "you": "tu",
+    "organizer": "organizator",
+    "opened": "Deschis",
+    "notOpened": "Nedeschis",
+    "start": "Pornește petrecerea",
+    "startSoon": "Pornirea extragerii vine în iterația următoare.",
+    "startNeedMore": "Adaugă cel puțin {{min}} participanți ca să poți porni.",
+    "budget": "Buget",
+    "location": "Locație",
+    "when": "Când",
+    "emailLanguage": "Limba emailurilor",
+    "notFound": "Nu am găsit această petrecere. Verifică dacă linkul este complet.",
+    "loadError": "Nu am putut încărca petrecerea."
+  },
+  "errors": {
+    "required": "Acest câmp este obligatoriu.",
+    "too_long": "Textul este prea lung.",
+    "invalid_email": "Introdu o adresă de email validă.",
+    "duplicate_email": "Acest email este deja în listă.",
+    "invalid_date": "Introdu o dată validă.",
+    "invalid_time": "Introdu o oră validă.",
+    "past_event": "Petrecerea trebuie să fie în viitor.",
+    "invalid_budget": "Introdu o sumă pozitivă.",
+    "invalid_gender": "Alege o opțiune validă.",
+    "invalid_locale": "Alege o limbă.",
+    "too_many_participants": "Sunt permiși cel mult {{max}} participanți.",
+    "invalid_access_code": "Codul de acces nu este corect.",
+    "daily_limit": "S-a atins limita zilnică de petreceri noi. Încearcă mâine.",
+    "locked": "Această petrecere a început deja și nu mai poate fi modificată.",
+    "not_found": "Nu am găsit această petrecere.",
+    "network": "Nu am putut contacta serverul. Verifică conexiunea.",
+    "not_configured": "Aplicația nu este conectată la server.",
+    "validation_failed": "Corectează câmpurile marcate.",
+    "server_error": "Ceva nu a mers bine. Încearcă din nou.",
+    "unknown": "Ceva nu a mers bine. Încearcă din nou."
   },
   "notFound": {
     "title": "Pagina nu a fost găsită",

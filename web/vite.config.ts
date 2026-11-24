@@ -6,6 +6,10 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig(({ command }) => ({
   base: command === 'build' ? '/secret-santa/' : '/',
   plugins: [react(), tailwindcss()],
+  server: {
+    // The web app imports the pure validation/time modules shared with the Edge Functions.
+    fs: { allow: ['..'] },
+  },
   test: {
     environment: 'node',
   },

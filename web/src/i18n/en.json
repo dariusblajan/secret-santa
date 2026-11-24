@@ -3,6 +3,17 @@
     "title": "Secret Santa",
     "tagline": "Private gift exchange for friends"
   },
+  "common": {
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "copy": "Copy link",
+    "copied": "Copied!",
+    "loading": "Loading…",
+    "backHome": "Back to home",
+    "tryAgain": "Try again"
+  },
   "language": {
     "label": "Language",
     "en": "English",
@@ -11,7 +22,7 @@
   "home": {
     "welcome": "Welcome!",
     "intro": "Create a party, invite your friends and let the draw decide who buys a gift for whom.",
-    "comingSoon": "Party creation arrives in the next iteration."
+    "create": "Create a party"
   },
   "health": {
     "title": "Backend status",
@@ -19,6 +30,87 @@
     "ok": "Backend is reachable",
     "error": "Backend is not reachable",
     "notConfigured": "Backend is not configured (missing environment variables)"
+  },
+  "create": {
+    "title": "Create a party",
+    "accessCode": "Access code",
+    "accessCodeHint": "Ask the person who runs this app for the code.",
+    "submit": "Save party"
+  },
+  "party": {
+    "details": "Party details",
+    "name": "Party name",
+    "date": "Date",
+    "time": "Time",
+    "timeHint": "Romanian time",
+    "location": "Location",
+    "locationHint": "Name of the place only, e.g. “Café Roma”",
+    "budget": "Budget (optional)",
+    "budgetPlaceholder": "20",
+    "language": "Email language",
+    "languageHint": "Invitations and reminders are sent in this language. The budget currency follows it.",
+    "currencyEn": "USD",
+    "currencyRo": "RON"
+  },
+  "participants": {
+    "title": "Participants",
+    "counter": "{{count}} / {{max}}",
+    "you": "You (organizer)",
+    "name": "Name",
+    "email": "Email",
+    "gender": "Gender (optional)",
+    "genderNone": "—",
+    "girl": "Girl",
+    "boy": "Boy",
+    "add": "Add participant",
+    "remove": "Remove participant",
+    "minHint": "You need at least {{min}} participants (including you) to start the draw."
+  },
+  "manage": {
+    "created": "Your party is created!",
+    "linkTitle": "Your private organizer link",
+    "linkHelp": "Save this link: it is the only way to manage the party.",
+    "emailSent": "We also emailed it to you.",
+    "emailNotSent": "We could not email the link, so please copy it now.",
+    "statusDraft": "Not started",
+    "statusDrawn": "Draw done",
+    "participantsHeading_one": "{{count}} participant",
+    "participantsHeading_other": "{{count}} participants",
+    "you": "you",
+    "organizer": "organizer",
+    "opened": "Opened",
+    "notOpened": "Not opened",
+    "start": "Start party",
+    "startSoon": "Starting the draw arrives in the next iteration.",
+    "startNeedMore": "Add at least {{min}} participants to start.",
+    "budget": "Budget",
+    "location": "Location",
+    "when": "When",
+    "emailLanguage": "Email language",
+    "notFound": "We could not find this party. Check that the link is complete.",
+    "loadError": "Could not load the party."
+  },
+  "errors": {
+    "required": "This field is required.",
+    "too_long": "This is too long.",
+    "invalid_email": "Enter a valid email address.",
+    "duplicate_email": "This email is already in the list.",
+    "invalid_date": "Enter a valid date.",
+    "invalid_time": "Enter a valid time.",
+    "past_event": "The party must be in the future.",
+    "invalid_budget": "Enter a positive amount.",
+    "invalid_gender": "Choose a valid option.",
+    "invalid_locale": "Choose a language.",
+    "too_many_participants": "At most {{max}} participants are allowed.",
+    "invalid_access_code": "That access code is not correct.",
+    "daily_limit": "The daily limit of new parties has been reached. Try again tomorrow.",
+    "locked": "This party has already started and can no longer be edited.",
+    "not_found": "We could not find this party.",
+    "network": "Could not reach the server. Check your connection.",
+    "not_configured": "The app is not connected to its backend.",
+    "validation_failed": "Please fix the highlighted fields.",
+    "server_error": "Something went wrong. Please try again.",
+    "unknown": "Something went wrong. Please try again."
   },
   "notFound": {
     "title": "Page not found",

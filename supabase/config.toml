@@ -432,3 +432,9 @@ enabled = true
 # so the gateway JWT check is disabled (it also doesn't understand publishable keys).
 [functions.health]
 verify_jwt = false
+
+[functions.create-party]
+verify_jwt = false
+
+[functions.manage-party]
+verify_jwt = false

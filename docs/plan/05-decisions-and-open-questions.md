@@ -28,6 +28,12 @@
 | D22 | No reminders after the event date | Confirmed |
 | D23 | Organizer sees only an "opened" flag per participant, never matches/themes | Lets them nudge people who haven't looked; leaks nothing |
 | D24 | Access code (formerly "passphrase") kept as a cheap guard, easy to remove | See 1.5 |
+| D25 | Admin link is never stored in the browser; after creating a party the app redirects to the manage page (the link is in the URL) and shows a copy-link banner | Confirmed |
+| D26 | Events in the past are rejected (browser and server) | Confirmed |
+| D27 | Iteration 1 sends the real admin-link email through Brevo | Confirmed |
+| D28 | Validation and time helpers are dependency-free TypeScript in `supabase/functions/_shared`, imported by both the web app and the functions (replaces the planned Zod schemas) | One source of truth without a Deno/npm dependency mismatch |
+| D29 | The access code field lives on the create form (not on the home page) | Survives page refresh, simpler |
+| D30 | Create/update run as atomic SQL functions (`create_party_tx`, `update_party_tx`); editing replaces the participant list | Draft-stage only, no tokens to preserve |
 
 ## 5.2 Open questions
 

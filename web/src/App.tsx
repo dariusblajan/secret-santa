@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Link, Route, Routes } from 'react-router-dom'
 import { LANGUAGES, setLanguage, type Language } from './i18n'
 import { api, isBackendConfigured } from './lib/api'
+import CreatePartyPage from './pages/CreatePartyPage'
+import ManagePage from './pages/ManagePage'
 
 function LanguageSwitcher() {
   const { t, i18n } = useTranslation()
@@ -53,10 +55,12 @@ function HealthStatus() {
 function Home() {
   const { t } = useTranslation()
   return (
-    <section className="space-y-4">
+    <section className="space-y-6">
       <h2 className="text-2xl font-semibold">{t('home.welcome')}</h2>
       <p>{t('home.intro')}</p>
-      <p className="text-neutral-500">{t('home.comingSoon')}</p>
+      <Link to="/create" className="inline-block rounded bg-red-700 px-5 py-2 font-medium text-white">
+        {t('home.create')}
+      </Link>
       <HealthStatus />
     </section>
   )
@@ -87,6 +91,8 @@ export default function App() {
       <main className="flex-1 py-8">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/create" element={<CreatePartyPage />} />
+          <Route path="/manage/:token" element={<ManagePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
