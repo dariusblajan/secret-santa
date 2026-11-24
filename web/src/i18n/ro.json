@@ -1,0 +1,27 @@
+{
+  "app": {
+    "title": "Secret Santa",
+    "tagline": "Schimb de cadouri privat, între prieteni"
+  },
+  "language": {
+    "label": "Limbă",
+    "en": "English",
+    "ro": "Română"
+  },
+  "home": {
+    "welcome": "Bine ai venit!",
+    "intro": "Creează o petrecere, invită-ți prietenii și lasă extragerea să decidă cine cumpără cadou pentru cine.",
+    "comingSoon": "Crearea petrecerii vine în iterația următoare."
+  },
+  "health": {
+    "title": "Starea serverului",
+    "checking": "Se verifică…",
+    "ok": "Serverul este accesibil",
+    "error": "Serverul nu este accesibil",
+    "notConfigured": "Serverul nu este configurat (lipsesc variabilele de mediu)"
+  },
+  "notFound": {
+    "title": "Pagina nu a fost găsită",
+    "back": "Înapoi acasă"
+  }
+}

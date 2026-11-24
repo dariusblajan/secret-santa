@@ -1,0 +1,27 @@
+{
+  "app": {
+    "title": "Secret Santa",
+    "tagline": "Private gift exchange for friends"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "ro": "Română"
+  },
+  "home": {
+    "welcome": "Welcome!",
+    "intro": "Create a party, invite your friends and let the draw decide who buys a gift for whom.",
+    "comingSoon": "Party creation arrives in the next iteration."
+  },
+  "health": {
+    "title": "Backend status",
+    "checking": "Checking…",
+    "ok": "Backend is reachable",
+    "error": "Backend is not reachable",
+    "notConfigured": "Backend is not configured (missing environment variables)"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "back": "Back to home"
+  }
+}
