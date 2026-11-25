@@ -49,64 +49,68 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 
 ---
 
-## Iteration 2: Draw and invite emails
+## Iteration 2: Draw, themes, invite emails and a minimal reveal page
 
 **Flow**
-1. Manage page → matching option: mixed (default) or same-gender (girl-girl / boy-boy).
-2. Pre-flight validation (min 3, gender set when same-gender, group sizes).
-3. "Start party" → confirmation dialog → server draws, stores, sends invites to everyone including the organizer.
-4. Manage page now shows per-person status (invited / opened), never matches.
+1. Manage page → **Matching**: mixed (default) or same-gender (girl-girl / boy-boy).
+2. Manage page → **Gift themes**: the organizer toggles which themes from the predefined list (about 30, en/ro labels) go into the pool. Everything is selected by default, with Select all / Select none and a counter ("12 selected, need at least 4").
+3. Pre-flight checks. If anything blocks the start, a single **amber warning** (not a red error) appears just above the Start button, listing the reasons, and the button is disabled. Reasons: fewer than 3 participants; same-gender mode with missing genders or a group of 1 (e.g. "3 girls, 1 boy: the boy can't be matched. Add another boy or switch to mixed."); fewer selected themes than participants. A group of exactly 2 is allowed.
+4. **Start party** → confirmation dialog → the server draws matches, deals themes, creates a private reveal link per person and emails everyone (organizer included).
+5. Manage page flips to "Draw done" with per-person invite status (sent / failed + **Resend**) and opened status. Participants are locked. The organizer never sees a match or a theme.
+6. Each participant opens their link and sees the party details, the participant names, **who they buy for and their gift theme**.
+
+**Theme dealing**
+- The pool is the organizer's selection. The server shuffles it (cryptographic Fisher–Yates), takes exactly as many themes as there are participants (the organizer counts), and deals one to each participant. Themes are unique within a party.
+- Independent from the giver→giftee shuffle. The theme is the style of the gift the *giver* buys.
+- Stored as theme ids; labels are rendered in the party language (emails) or UI language (reveal page).
 
 **UI**
-- Matching options panel with inline validation errors
+- Matching panel, theme selector (chips) with counter
+- Amber pre-flight warning above the Start button
 - Start confirmation dialog
-- Post-start manage page (status list, participants locked)
-- Invite email (HTML + text, ro + en)
+- Post-start manage page: invite status, Resend, opened flag
+- Minimal reveal page: party details, names, giftee, theme
+- Invite email (ro + en): details, who's coming, reveal link, privacy note. The match is **not** written in the email, only behind the link.
+
+**Behaviour**
+- Start is atomic and idempotent: a SQL function moves draft → drawn once and stores only reveal-token hashes.
+- If an invite fails, that person's `invited_at` stays empty. **Resend** creates a new link for that person and invalidates the old one.
+- The `manage-party` endpoint never returns match or theme fields. A new `reveal` function returns only the token owner's data.
 
 **Done when**
-- Draw passes the unit tests (no self-match, valid permutation, same-gender rules).
-- Invites delivered via Brevo (test with real inbox, check spam placement).
-- Re-clicking "Start" doesn't double-send (idempotent).
+- Draw tests pass: no self-match, valid single cycle for n = 3..15, same-gender groups, group of 1 is an error, group of 2 allowed, 10 000 random runs.
+- Theme tests pass: unique per party, exactly n dealt, error when the pool is too small.
+- Negative tests: wrong token reveals nothing; the manage response contains no match fields.
+- Real invites delivered via Brevo (check spam placement); double-click on Start doesn't double-send.
 
 ---
 
-## Iteration 3: Reveal page and redo draw
+## Iteration 3: Reveal polish and redo draw
 
 **Flow**
-1. Participant opens email link → reveal page → "tap to reveal" → sees giftee name, party details, budget, participant names.
-2. Page can be revisited later.
-3. Organizer chooses **Redo draw** → warning dialog → new draw → `redo` email to everyone.
-4. Participant reopens same link and sees the new match with a "draw was remade" banner.
+1. Reveal page gains the tap-to-reveal interaction and mobile-first polish; revisiting the link works.
+2. Organizer chooses **Redo draw** → warning dialog → new matches and themes → `redo` email to everyone.
+3. Participant reopens the same link, sees the new result with a "draw was remade" banner.
 
 **UI**
-- Reveal page (mobile-first), reveal interaction
-- Banner for remade draw
-- Redo dialog on manage page
+- Tap-to-reveal animation, banner for remade draw
+- Redo dialog on the manage page
 - Redo email (ro + en)
 
 **Done when**
-- Reveal API returns only the token owner's match.
-- Organizer token can't fetch any match (negative test).
 - After redo, old matches are gone and `revealed_at` resets.
+- Organizer token still can't fetch any match.
 
 ---
 
-## Iteration 4: Themes
+## Iteration 4: Custom themes and theme polish
 
-**Flow**
-1. Manage page → Themes: default list shown, toggle on/off, add custom.
-2. Counter shows enabled themes vs participants. Draw is blocked if too few.
-3. On draw, each participant is dealt a unique random theme, shown on the reveal page and in the invite/redo emails.
-
-**UI**
-- Theme editor (chips, add input, counter, too-few state)
-- Theme display on reveal page and emails
+**Scope**
+- The predefined list and selection ship in Iteration 2. This iteration adds **custom themes** (organizer types their own labels, stored per party) and a reorder/search nicety for the chip list if needed.
+- Theme nudge reminder copy.
 
 **Done when**
-- Themes unique per participant in every draw (tested).
-- Custom themes persist and appear in both languages' views.
-
-> Note: the draw in iteration 2 can ship with themes disabled or a fixed pool. This iteration makes the pool editable.
+- Custom themes persist, take part in the unique dealing, and appear in both languages' views.
 
 ---
 

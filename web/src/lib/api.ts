@@ -1,3 +1,4 @@
+import type { DrawIssue } from '../../../supabase/functions/_shared/draw.ts'
 import type { PartyInput, ValidationError } from '../../../supabase/functions/_shared/validation.ts'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined
@@ -9,11 +10,19 @@ export class ApiError extends Error {
   readonly status: number
   readonly code: string
   readonly errors: ValidationError[]
-  constructor(status: number, code: string, message: string, errors: ValidationError[] = []) {
+  readonly issues: DrawIssue[]
+  constructor(
+    status: number,
+    code: string,
+    message: string,
+    errors: ValidationError[] = [],
+    issues: DrawIssue[] = [],
+  ) {
     super(message)
     this.status = status
     this.code = code
     this.errors = errors
+    this.issues = issues
   }
 }
 
@@ -26,6 +35,8 @@ export interface ManageParty {
   locale: 'en' | 'ro'
   status: 'draft' | 'drawn'
   drawVersion: number
+  sameGender: boolean
+  themeIds: string[]
 }
 
 export interface ManageParticipant {
@@ -41,6 +52,20 @@ export interface ManageParticipant {
 export interface ManageData {
   party: ManageParty
   participants: ManageParticipant[]
+}
+
+export interface RevealData {
+  party: {
+    name: string
+    eventAt: string
+    locationName: string
+    budgetAmount: number | null
+    locale: 'en' | 'ro'
+  }
+  you: string
+  giftee: string
+  themeId: string | null
+  participantNames: string[]
 }
 
 /** Call a Supabase Edge Function. Access control is enforced inside each function (tokens / access code). */
@@ -64,16 +89,28 @@ export async function callFunction<T>(name: string, body?: unknown): Promise<T> 
   }
   const data = await res.json().catch(() => ({}))
   if (!res.ok) {
-    throw new ApiError(res.status, data.code ?? 'unknown', data.message ?? res.statusText, data.errors ?? [])
+    throw new ApiError(
+      res.status,
+      data.code ?? 'unknown',
+      data.message ?? res.statusText,
+      data.errors ?? [],
+      data.issues ?? [],
+    )
   }
   return data as T
 }
+
+const manage = (token: string, action: string, extra: Record<string, unknown> = {}) =>
+  callFunction<ManageData>('manage-party', { token, action, ...extra })
 
 export const api = {
   health: () => callFunction<{ ok: boolean; time: string }>('health'),
   createParty: (accessCode: string, party: PartyInput) =>
     callFunction<{ adminToken: string; emailSent: boolean }>('create-party', { accessCode, party }),
-  getParty: (token: string) => callFunction<ManageData>('manage-party', { token, action: 'get' }),
-  updateParty: (token: string, party: PartyInput) =>
-    callFunction<ManageData>('manage-party', { token, action: 'update', party }),
+  getParty: (token: string) => manage(token, 'get'),
+  updateParty: (token: string, party: PartyInput) => manage(token, 'update', { party }),
+  setThemes: (token: string, themeIds: string[]) => manage(token, 'set-themes', { themeIds }),
+  startParty: (token: string, sameGender: boolean) => manage(token, 'start', { sameGender }),
+  resendInvite: (token: string, participantId: string) => manage(token, 'resend', { participantId }),
+  reveal: (token: string) => callFunction<RevealData>('reveal', { token }),
 }

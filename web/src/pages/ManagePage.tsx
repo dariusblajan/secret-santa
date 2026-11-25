@@ -2,8 +2,10 @@ import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { formatBudget, formatEventDateTime } from '../../../supabase/functions/_shared/time.ts'
-import { LIMITS, type ValidationError } from '../../../supabase/functions/_shared/validation.ts'
+import type { ValidationError } from '../../../supabase/functions/_shared/validation.ts'
+import ParticipantList from '../components/ParticipantList'
 import PartyForm from '../components/PartyForm'
+import StartPanel from '../components/StartPanel'
 import { api, ApiError, type ManageData } from '../lib/api'
 import { apiErrorMessage } from '../lib/errors'
 import { formFromManageData, toPartyInput } from '../lib/partyForm'
@@ -106,10 +108,9 @@ export default function ManagePage() {
     )
   }
 
-  const { party, participants } = data
+  const { party } = data
   const isDraft = party.status === 'draft'
   const uiLocale = i18n.language === 'ro' ? 'ro' : 'en'
-  const canStart = participants.length >= LIMITS.minParticipantsToStart
 
   if (editing) {
     return (
@@ -177,49 +178,13 @@ export default function ManagePage() {
         </p>
       </div>
 
-      <div className="space-y-3">
-        <h3 className="text-lg font-semibold">
-          {t('manage.participantsHeading', { count: participants.length })}
-        </h3>
-        <ul className="divide-y divide-neutral-200 rounded border border-neutral-200">
-          {participants.map((p) => (
-            <li key={p.id} className="flex items-center justify-between gap-3 p-3 text-sm">
-              <div>
-                <p className="font-medium">
-                  {p.name}
-                  {p.isOrganizer && (
-                    <span className="ml-2 text-xs font-normal text-neutral-500">
-                      ({t('manage.you')}, {t('manage.organizer')})
-                    </span>
-                  )}
-                </p>
-                <p className="text-neutral-500">
-                  {p.email}
-                  {p.gender && ` · ${t(`participants.${p.gender}`)}`}
-                </p>
-              </div>
-              {!isDraft && (
-                <span className="text-xs text-neutral-500">
-                  {p.openedAt ? t('manage.opened') : t('manage.notOpened')}
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
+      <ParticipantList token={token} data={data} onChange={setData} />
 
-      <div className="space-y-2">
-        <button
-          type="button"
-          disabled
-          className="rounded bg-red-700 px-5 py-2 font-medium text-white disabled:opacity-50"
-        >
-          {t('manage.start')}
-        </button>
-        <p className="text-xs text-neutral-500">
-          {canStart ? t('manage.startSoon') : t('manage.startNeedMore', { min: LIMITS.minParticipantsToStart })}
-        </p>
-      </div>
+      {isDraft ? (
+        <StartPanel token={token} data={data} onChange={setData} />
+      ) : (
+        <p className="text-xs text-neutral-500">{t('manage.lockedNote')}</p>
+      )}
     </section>
   )
 }

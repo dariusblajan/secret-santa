@@ -2,6 +2,7 @@ import { sendEmail } from '../_shared/brevo.ts'
 import { json, preflight } from '../_shared/cors.ts'
 import { adminClient } from '../_shared/db.ts'
 import { adminLinkEmail } from '../_shared/emails/admin_link.ts'
+import { ALL_THEME_IDS } from '../_shared/themes.ts'
 import { bucharestToDate } from '../_shared/time.ts'
 import { generateToken, safeEqual, sha256Hex } from '../_shared/tokens.ts'
 import { LIMITS, normalizeParty, validateParty } from '../_shared/validation.ts'
@@ -39,12 +40,14 @@ Deno.serve(async (req) => {
 
   // 3. Daily cap on new parties
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  // A normal GET (not HEAD) so that failures include the real error message in the logs.
   const { count, error: countError } = await db
     .from('parties')
-    .select('id', { count: 'exact', head: true })
+    .select('id', { count: 'exact' })
     .gte('created_at', since)
+    .limit(1)
   if (countError) {
-    console.error('count failed', countError)
+    console.error('count failed', JSON.stringify(countError), countError.message, countError.code, countError.details)
     return json(req, { code: 'server_error', message: 'Something went wrong' }, 500)
   }
   if ((count ?? 0) >= LIMITS.maxPartiesPerDay) {
@@ -61,6 +64,7 @@ Deno.serve(async (req) => {
       location_name: input.locationName,
       budget_amount: input.budgetAmount === null ? '' : String(input.budgetAmount),
       locale: input.locale,
+      theme_ids: ALL_THEME_IDS, // everything selected by default; the organizer can narrow it
     },
     p_participants: input.participants,
     p_admin_hash: await sha256Hex(token),

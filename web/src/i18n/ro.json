@@ -82,14 +82,18 @@
     "opened": "Deschis",
     "notOpened": "Nedeschis",
     "start": "Pornește petrecerea",
-    "startSoon": "Pornirea extragerii vine în iterația următoare.",
-    "startNeedMore": "Adaugă cel puțin {{min}} participanți ca să poți porni.",
     "budget": "Buget",
     "location": "Locație",
     "when": "Când",
     "emailLanguage": "Limba emailurilor",
     "notFound": "Nu am găsit această petrecere. Verifică dacă linkul este complet.",
-    "loadError": "Nu am putut încărca petrecerea."
+    "loadError": "Nu am putut încărca petrecerea.",
+    "inviteSent": "Invitație trimisă",
+    "inviteFailed": "Invitație netrimisă",
+    "resend": "Retrimite invitația",
+    "resending": "Se trimite…",
+    "startedNote": "Toți au primit pe email un link privat. Potrivirile și temele sunt secrete, chiar și pentru tine.",
+    "lockedNote": "Extragerea s-a făcut, așa că participanții nu mai pot fi modificați."
   },
   "errors": {
     "required": "Acest câmp este obligatoriu.",
@@ -111,10 +115,54 @@
     "not_configured": "Aplicația nu este conectată la server.",
     "validation_failed": "Corectează câmpurile marcate.",
     "server_error": "Ceva nu a mers bine. Încearcă din nou.",
-    "unknown": "Ceva nu a mers bine. Încearcă din nou."
+    "unknown": "Ceva nu a mers bine. Încearcă din nou.",
+    "cannot_start": "Petrecerea nu poate fi pornită încă. Verifică avertismentul de deasupra butonului.",
+    "conflict": "Participanții s-au schimbat în timpul pornirii. Încearcă din nou.",
+    "not_started": "Petrecerea nu a început încă."
   },
   "notFound": {
     "title": "Pagina nu a fost găsită",
     "back": "Înapoi acasă"
+  },
+  "matching": {
+    "title": "Potrivire",
+    "mixed": "Mixtă: oricine poate trage pe oricine",
+    "sameGender": "Doar fete cu fete și băieți cu băieți",
+    "sameGenderHint": "Fiecare participant trebuie să aibă genul setat. Fetele trag doar fete, băieții trag doar băieți."
+  },
+  "themes": {
+    "title": "Teme pentru cadouri",
+    "hint": "Fiecare participant primește o temă unică, drept indiciu pentru cadou.",
+    "counter": "{{selected}} selectate, ai nevoie de cel puțin {{needed}}",
+    "selectAll": "Selectează tot",
+    "selectNone": "Deselectează tot"
+  },
+  "start": {
+    "button": "Pornește petrecerea",
+    "starting": "Se pornește…",
+    "warningTitle": "Nu se poate porni încă",
+    "dialogTitle": "Pornești petrecerea?",
+    "dialogBody": "Se extrag numele și se trimite email tuturor celor {{count}} participanți. Potrivirile rămân secrete, chiar și pentru tine, și nu mai pot fi schimbate.",
+    "dialogCancel": "Anulează",
+    "dialogConfirm": "Pornește și trimite invitațiile",
+    "groups": {
+      "girl": "Fete",
+      "boy": "Băieți"
+    },
+    "issues": {
+      "too_few_participants": "Adaugă cel puțin {{min}} participanți ca să pornești (ai {{count}}).",
+      "missing_gender": "Potrivirea pe același gen cere genul fiecărui participant. Lipsește pentru: {{names}}.",
+      "group_too_small": "Grupul „{{group}}” are o singură persoană, deci nu poate fi potrivită în interiorul lui. Adaugă pe cineva în acest grup sau treci la potrivire mixtă.",
+      "too_few_themes": "Selectează cel puțin {{needed}} teme (ai {{selected}})."
+    }
+  },
+  "reveal": {
+    "greeting": "Salut, {{name}}!",
+    "buyingFor": "Cumperi un cadou pentru",
+    "theme": "Tema cadoului tău",
+    "secret": "Păstrează secretul. Doar tu poți vedea această pagină.",
+    "whosComing": "Cine vine",
+    "notFound": "Acest link nu este valid. Cere organizatorului să îți retrimită invitația.",
+    "loadError": "Nu am putut încărca rezultatul tău."
   }
 }

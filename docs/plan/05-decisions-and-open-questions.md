@@ -34,6 +34,11 @@
 | D28 | Validation and time helpers are dependency-free TypeScript in `supabase/functions/_shared`, imported by both the web app and the functions (replaces the planned Zod schemas) | One source of truth without a Deno/npm dependency mismatch |
 | D29 | The access code field lives on the create form (not on the home page) | Survives page refresh, simpler |
 | D30 | Create/update run as atomic SQL functions (`create_party_tx`, `update_party_tx`); editing replaces the participant list | Draft-stage only, no tokens to preserve |
+| D31 | Themes ship in Iteration 2: organizer selects from the predefined list; the app shuffles it, takes exactly as many as participants (organizer included) and deals one unique theme to each | Confirmed |
+| D32 | A minimal reveal page ships in Iteration 2 so invite links work; Iteration 3 adds the polish and redo | Confirmed |
+| D33 | Start blockers (same-gender mismatch, too few participants, too few themes) show an amber warning above the Start button and disable it | Confirmed |
+| D34 | Failed invites get a per-person Resend that rotates that person's link | Confirmed |
+| D35 | Custom themes move to Iteration 4 | Predefined list is enough for the first end-to-end run |
 
 ## 5.2 Open questions
 

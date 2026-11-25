@@ -5,6 +5,7 @@ import { LANGUAGES, setLanguage, type Language } from './i18n'
 import { api, isBackendConfigured } from './lib/api'
 import CreatePartyPage from './pages/CreatePartyPage'
 import ManagePage from './pages/ManagePage'
+import RevealPage from './pages/RevealPage'
 
 function LanguageSwitcher() {
   const { t, i18n } = useTranslation()
@@ -93,6 +94,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/create" element={<CreatePartyPage />} />
           <Route path="/manage/:token" element={<ManagePage />} />
+          <Route path="/reveal/:token" element={<RevealPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

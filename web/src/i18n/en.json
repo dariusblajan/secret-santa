@@ -81,14 +81,18 @@
     "opened": "Opened",
     "notOpened": "Not opened",
     "start": "Start party",
-    "startSoon": "Starting the draw arrives in the next iteration.",
-    "startNeedMore": "Add at least {{min}} participants to start.",
     "budget": "Budget",
     "location": "Location",
     "when": "When",
     "emailLanguage": "Email language",
     "notFound": "We could not find this party. Check that the link is complete.",
-    "loadError": "Could not load the party."
+    "loadError": "Could not load the party.",
+    "inviteSent": "Invite sent",
+    "inviteFailed": "Invite not sent",
+    "resend": "Resend invite",
+    "resending": "Sending…",
+    "startedNote": "Everyone has been emailed a private link. Matches and themes are secret, even from you.",
+    "lockedNote": "The draw is done, so participants can no longer be edited."
   },
   "errors": {
     "required": "This field is required.",
@@ -110,10 +114,54 @@
     "not_configured": "The app is not connected to its backend.",
     "validation_failed": "Please fix the highlighted fields.",
     "server_error": "Something went wrong. Please try again.",
-    "unknown": "Something went wrong. Please try again."
+    "unknown": "Something went wrong. Please try again.",
+    "cannot_start": "The party can't be started yet. Check the warning above the button.",
+    "conflict": "The participants changed while starting. Please try again.",
+    "not_started": "The party hasn't started yet."
   },
   "notFound": {
     "title": "Page not found",
     "back": "Back to home"
+  },
+  "matching": {
+    "title": "Matching",
+    "mixed": "Mixed: anyone can get anyone",
+    "sameGender": "Girl-girl and boy-boy only",
+    "sameGenderHint": "Everyone needs a gender set. Girls only get girls, boys only get boys."
+  },
+  "themes": {
+    "title": "Gift themes",
+    "hint": "Each participant gets one unique theme as a hint for their gift.",
+    "counter": "{{selected}} selected, need at least {{needed}}",
+    "selectAll": "Select all",
+    "selectNone": "Select none"
+  },
+  "start": {
+    "button": "Start party",
+    "starting": "Starting…",
+    "warningTitle": "Can't start yet",
+    "dialogTitle": "Start the party?",
+    "dialogBody": "This draws names and emails all {{count}} participants. Matches stay secret, even from you, and can't be changed afterwards.",
+    "dialogCancel": "Cancel",
+    "dialogConfirm": "Start and send invites",
+    "groups": {
+      "girl": "Girls",
+      "boy": "Boys"
+    },
+    "issues": {
+      "too_few_participants": "Add at least {{min}} participants to start (you have {{count}}).",
+      "missing_gender": "Same-gender matching needs a gender for everyone. Missing for: {{names}}.",
+      "group_too_small": "The \"{{group}}\" group has only one person, so they can't be matched within it. Add someone to that group or switch to mixed matching.",
+      "too_few_themes": "Select at least {{needed}} themes (you have {{selected}})."
+    }
+  },
+  "reveal": {
+    "greeting": "Hi {{name}}!",
+    "buyingFor": "You are buying a gift for",
+    "theme": "Your gift theme",
+    "secret": "Keep this a secret. Only you can see this page.",
+    "whosComing": "Who's coming",
+    "notFound": "This link is not valid. Ask the organizer to resend your invite.",
+    "loadError": "Could not load your match."
   }
 }

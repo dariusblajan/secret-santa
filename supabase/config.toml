@@ -438,3 +438,6 @@ verify_jwt = false
 
 [functions.manage-party]
 verify_jwt = false
+
+[functions.reveal]
+verify_jwt = false
