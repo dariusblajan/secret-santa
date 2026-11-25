@@ -42,25 +42,25 @@ export default function ExclusionsPanel({ token, data, onChange }: Props) {
   }
 
   return (
-    <details open={exclusions.length > 0} className="space-y-3">
-      <summary className="cursor-pointer text-lg font-semibold">
+    <details open={exclusions.length > 0} className="card">
+      <summary className="card-title flex min-h-11 cursor-pointer items-center">
         {t('exclusions.title')}
         {exclusions.length > 0 && ` (${exclusions.length})`}
       </summary>
-      <div className="mt-3 space-y-3">
-        <p className="text-xs text-neutral-500">{t('exclusions.hint')}</p>
-        <p className="text-xs text-neutral-500">{t('exclusions.privacy')}</p>
+      <div className="mt-3 grid gap-3">
+        <p className="note">{t('exclusions.hint')}</p>
+        <p className="note">{t('exclusions.privacy')}</p>
         {exclusions.length > 0 && (
-          <ul className="divide-y divide-neutral-200 rounded border border-neutral-200">
+          <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line">
             {exclusions.map((x) => (
-              <li key={`${x.giverId}-${x.gifteeId}`} className="flex items-center justify-between gap-3 p-2 text-sm">
+              <li key={`${x.giverId}-${x.gifteeId}`} className="flex items-center justify-between gap-3 py-2 pr-2 pl-3 text-sm">
                 <span>{t('exclusions.rule', { giver: name(x.giverId), giftee: name(x.gifteeId) })}</span>
                 <button
                   type="button"
                   disabled={busy}
                   onClick={() => void run(() => api.removeExclusion(token, x.giverId, x.gifteeId))}
                   aria-label={t('exclusions.remove', { giver: name(x.giverId), giftee: name(x.gifteeId) })}
-                  className="text-neutral-600 hover:text-red-700"
+                  className="btn btn-danger btn-sm !min-h-11 w-11 shrink-0 !px-0"
                 >
                   ×
                 </button>
@@ -68,12 +68,12 @@ export default function ExclusionsPanel({ token, data, onChange }: Props) {
             ))}
           </ul>
         )}
-        <form onSubmit={add} className="flex flex-wrap items-center gap-2 text-sm">
+        <form onSubmit={add} className="grid gap-2 text-sm">
           <select
             value={giver}
             onChange={(e) => setGiver(e.target.value)}
             aria-label={t('exclusions.giver')}
-            className="rounded border border-neutral-300 px-2 py-1"
+            className="input"
           >
             <option value="">{t('exclusions.giver')}</option>
             {participants.map((p) => (
@@ -82,12 +82,12 @@ export default function ExclusionsPanel({ token, data, onChange }: Props) {
               </option>
             ))}
           </select>
-          <span>{t('exclusions.cantBuyFor')}</span>
+          <span className="text-center font-bold text-muted">{t('exclusions.cantBuyFor')}</span>
           <select
             value={giftee}
             onChange={(e) => setGiftee(e.target.value)}
             aria-label={t('exclusions.giftee')}
-            className="rounded border border-neutral-300 px-2 py-1"
+            className="input"
           >
             <option value="">{t('exclusions.giftee')}</option>
             {participants
@@ -101,13 +101,13 @@ export default function ExclusionsPanel({ token, data, onChange }: Props) {
           <button
             type="submit"
             disabled={busy || !giver || !giftee}
-            className="rounded border border-neutral-300 px-3 py-1 disabled:opacity-50"
+            className="btn btn-secondary"
           >
             {t('exclusions.add')}
           </button>
         </form>
         {error && (
-          <p className="text-sm text-red-600" role="alert">
+          <p className="callout callout-error" role="alert">
             {error}
           </p>
         )}

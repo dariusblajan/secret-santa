@@ -32,18 +32,18 @@ function CreatedBanner({ token, emailSent }: { token: string; emailSent: boolean
   }
 
   return (
-    <div className="space-y-3 rounded border border-green-600 bg-green-50 p-4 text-green-950 dark:bg-green-950 dark:text-green-50">
-      <p className="font-semibold">🎉 {t('manage.created')}</p>
-      <p className="text-sm font-medium">{t('manage.linkTitle')}</p>
-      <div className="flex gap-2">
+    <div className="callout callout-ok grid gap-3 p-4">
+      <p className="font-display text-lg font-bold">🎉 {t('manage.created')}</p>
+      <p className="text-sm font-bold">{t('manage.linkTitle')}</p>
+      <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
         <input
           readOnly
           value={link}
           onFocus={(e) => e.currentTarget.select()}
           aria-label={t('manage.linkTitle')}
-          className="w-full rounded border border-green-700 bg-white px-2 py-1 text-sm text-neutral-900"
+          className="input min-w-0 text-sm"
         />
-        <button type="button" onClick={copy} className="shrink-0 rounded bg-green-700 px-3 py-1 text-sm text-white">
+        <button type="button" onClick={copy} className="btn btn-secondary">
           {copied ? t('common.copied') : t('common.copy')}
         </button>
       </div>
@@ -83,9 +83,9 @@ export default function ManagePage() {
   if (state === 'loading') return <p>{t('common.loading')}</p>
   if (state === 'notFound') {
     return (
-      <div className="space-y-4">
+      <div className="grid gap-4">
         <p>{t('manage.notFound')}</p>
-        <Link to="/" className="underline">
+        <Link to="/" className="btn btn-neutral sm:w-fit">
           {t('common.backHome')}
         </Link>
       </div>
@@ -93,15 +93,15 @@ export default function ManagePage() {
   }
   if (state === 'error' || !data) {
     return (
-      <div className="space-y-4">
-        <p role="alert">{t('manage.loadError')}</p>
+      <div className="grid gap-4">
+        <p className="callout callout-error" role="alert">{t('manage.loadError')}</p>
         <button
           type="button"
           onClick={() => {
             setState('loading')
             void load()
           }}
-          className="underline"
+          className="btn btn-secondary sm:w-fit"
         >
           {t('common.tryAgain')}
         </button>
@@ -115,8 +115,8 @@ export default function ManagePage() {
 
   if (editing) {
     return (
-      <section className="space-y-6">
-        <h2 className="text-2xl font-semibold">{t('common.edit')}</h2>
+      <section className="grid gap-6">
+        <h2 className="page-title">{t('common.edit')}</h2>
         <PartyForm
           mode="edit"
           initial={formFromManageData(data)}
@@ -148,35 +148,33 @@ export default function ManagePage() {
   }
 
   return (
-    <section className="space-y-8">
+    <section className="grid gap-6">
       {navState?.justCreated && <CreatedBanner token={token} emailSent={Boolean(navState.emailSent)} />}
 
-      <div className="space-y-3">
-        <div className="flex items-start justify-between gap-4">
-          <h2 className="text-2xl font-semibold">🎄 {party.name}</h2>
-          {isDraft && (
-            <button type="button" onClick={() => setEditing(true)} className="text-sm underline">
-              {t('common.edit')}
-            </button>
-          )}
+      <div className="card">
+        <div className="grid gap-2">
+          <p className="pill w-fit">{isDraft ? t('manage.statusDraft') : t('manage.statusDrawn')}</p>
+          <h2 className="page-title break-words">🎄 {party.name}</h2>
         </div>
-        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-          <dt className="text-neutral-500">{t('manage.when')}</dt>
+        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-[15px]">
+          <dt className="font-bold text-muted">{t('manage.when')}</dt>
           <dd>{formatEventDateTime(party.eventAt, uiLocale)}</dd>
-          <dt className="text-neutral-500">{t('manage.location')}</dt>
+          <dt className="font-bold text-muted">{t('manage.location')}</dt>
           <dd>{party.locationName}</dd>
           {party.budgetAmount !== null && (
             <>
-              <dt className="text-neutral-500">{t('manage.budget')}</dt>
+              <dt className="font-bold text-muted">{t('manage.budget')}</dt>
               <dd>{formatBudget(party.budgetAmount, party.locale)}</dd>
             </>
           )}
-          <dt className="text-neutral-500">{t('manage.emailLanguage')}</dt>
+          <dt className="font-bold text-muted">{t('manage.emailLanguage')}</dt>
           <dd>{t(`language.${party.locale}`)}</dd>
         </dl>
-        <p className="inline-block rounded-full bg-neutral-200 px-3 py-1 text-xs font-medium text-neutral-800">
-          {isDraft ? t('manage.statusDraft') : t('manage.statusDrawn')}
-        </p>
+        {isDraft && (
+          <button type="button" onClick={() => setEditing(true)} className="btn btn-neutral">
+            {t('common.edit')}
+          </button>
+        )}
       </div>
 
       <ParticipantList token={token} data={data} onChange={setData} />
@@ -185,11 +183,11 @@ export default function ManagePage() {
         <StartPanel token={token} data={data} onChange={setData} />
       ) : (
         <>
-          <p className="text-xs text-neutral-500">{t('manage.lockedNote')}</p>
+          <p className="note">{t('manage.lockedNote')}</p>
           {new Date(party.eventAt).getTime() > now ? (
             <StartPanel token={token} data={data} onChange={setData} />
           ) : (
-            <p className="text-sm text-neutral-600">{t('redo.eventPassed')}</p>
+            <p className="note">{t('redo.eventPassed')}</p>
           )}
         </>
       )}

@@ -24,19 +24,18 @@ interface Props {
   onCancel?: () => void
 }
 
-const inputClass =
-  'w-full rounded border border-neutral-300 bg-transparent px-3 py-2 text-base aria-[invalid=true]:border-red-600'
+const inputClass = 'input'
 
 function Field(props: { label: string; hint?: string; error?: string; htmlFor: string; children: ReactNode }) {
   return (
-    <div className="space-y-1">
-      <label htmlFor={props.htmlFor} className="block text-sm font-medium">
+    <div className="grid min-w-0 gap-1.5">
+      <label htmlFor={props.htmlFor} className="block text-sm font-bold">
         {props.label}
       </label>
       {props.children}
-      {props.hint && !props.error && <p className="text-xs text-neutral-500">{props.hint}</p>}
+      {props.hint && !props.error && <p className="text-[13px] text-muted">{props.hint}</p>}
       {props.error && (
-        <p className="text-xs text-red-600" role="alert">
+        <p className="text-[13px] font-bold text-danger" role="alert">
           {props.error}
         </p>
       )}
@@ -170,8 +169,9 @@ export default function PartyForm({ mode, initial, submitting, serverErrors, for
   const participantsError = errorFor('participants')
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-8">
+    <form onSubmit={handleSubmit} noValidate className="grid gap-6 pb-28">
       {mode === 'create' && (
+        <div className="card">
         <Field
           label={t('create.accessCode')}
           hint={t('create.accessCodeHint')}
@@ -188,10 +188,11 @@ export default function PartyForm({ mode, initial, submitting, serverErrors, for
             className={inputClass}
           />
         </Field>
+        </div>
       )}
 
-      <section className="space-y-4">
-        <h3 className="text-lg font-semibold">{t('party.details')}</h3>
+      <section className="card">
+        <h3 className="card-title">{t('party.details')}</h3>
 
         <Field label={t('party.name')} error={errorFor('name')} htmlFor="name">
           <input
@@ -204,7 +205,7 @@ export default function PartyForm({ mode, initial, submitting, serverErrors, for
           />
         </Field>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <Field label={t('party.date')} error={errorFor('date')} htmlFor="date">
             <input
               id="date"
@@ -243,9 +244,9 @@ export default function PartyForm({ mode, initial, submitting, serverErrors, for
           />
         </Field>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <Field label={t('party.budget')} error={errorFor('budgetAmount')} htmlFor="budget">
-            <div className="flex items-center gap-2">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
               <input
                 id="budget"
                 inputMode="decimal"
@@ -255,7 +256,7 @@ export default function PartyForm({ mode, initial, submitting, serverErrors, for
                 aria-invalid={Boolean(errorFor('budgetAmount'))}
                 className={inputClass}
               />
-              <span className="text-sm text-neutral-500">{currency}</span>
+              <span className="text-[15px] font-extrabold text-muted">{currency}</span>
             </div>
           </Field>
           <Field
@@ -277,52 +278,36 @@ export default function PartyForm({ mode, initial, submitting, serverErrors, for
         </div>
       </section>
 
-      <section className="space-y-4">
-        <div className="flex items-baseline justify-between">
-          <h3 className="text-lg font-semibold">{t('participants.title')}</h3>
-          <span className="text-sm text-neutral-500">
+      <section className="card">
+        <div className="flex items-baseline justify-between gap-3">
+          <h3 className="card-title">{t('participants.title')}</h3>
+          <span className="pill">
             {t('participants.counter', { count: values.participants.length, max: LIMITS.maxParticipants })}
           </span>
         </div>
-        <p className="text-xs text-neutral-500">
+        <p className="note">
           {t('participants.minHint', { min: LIMITS.minParticipantsToStart })}
         </p>
         {participantsError && (
-          <p className="text-xs text-red-600" role="alert">
+          <p className="callout callout-error" role="alert">
             {participantsError}
           </p>
         )}
 
-        <ul className="space-y-4">
+        <ul className="grid gap-4">
           {values.participants.map((p, i) => {
             const nameError = errorFor(`participants.${i}.name`)
             const emailError = errorFor(`participants.${i}.email`)
             return (
-              <li key={i} className="space-y-3 rounded border border-neutral-200 p-3">
+              <li key={i} className="grid gap-3 rounded-[14px] bg-paper-deep p-3.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-xs font-extrabold tracking-wide uppercase ${
+                      i === 0 ? 'bg-pine text-white' : 'border border-line bg-surface text-muted'
+                    }`}
+                  >
                     {i === 0 ? t('participants.you') : `#${i + 1}`}
                   </span>
-                  {i > 0 && (
-                    <div className="flex gap-4">
-                      <button
-                        type="button"
-                        onClick={() => makeOrganizer(i)}
-                        className="text-sm underline"
-                        aria-label={`${t('participants.makeOrganizer')} #${i + 1}`}
-                      >
-                        {t('participants.makeOrganizer')}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => removeParticipant(i)}
-                        className="text-sm text-red-700 underline"
-                        aria-label={`${t('participants.remove')} #${i + 1}`}
-                      >
-                        {t('participants.remove')}
-                      </button>
-                    </div>
-                  )}
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Field label={t('participants.name')} error={nameError} htmlFor={`p-${i}-name`}>
@@ -357,27 +342,49 @@ export default function PartyForm({ mode, initial, submitting, serverErrors, for
                     <option value="boy">{t('participants.boy')}</option>
                   </select>
                 </Field>
+                {i > 0 && (
+                  <div className="grid grid-cols-2 gap-2 pt-0.5">
+                    <button
+                      type="button"
+                      onClick={() => makeOrganizer(i)}
+                      className="btn btn-neutral btn-sm"
+                      aria-label={`${t('participants.makeOrganizer')} #${i + 1}`}
+                    >
+                      {t('participants.makeOrganizer')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeParticipant(i)}
+                      className="btn btn-danger btn-sm"
+                      aria-label={`${t('participants.remove')} #${i + 1}`}
+                    >
+                      {t('participants.remove')}
+                    </button>
+                  </div>
+                )}
               </li>
             )
           })}
         </ul>
 
-        <button
-          type="button"
-          onClick={addParticipant}
-          disabled={values.participants.length >= LIMITS.maxParticipants}
-          className="rounded border border-neutral-300 px-3 py-2 text-sm disabled:opacity-50"
-        >
-          + {t('participants.add')}
-        </button>
-        <button
-          type="button"
-          onClick={() => setImporting(true)}
-          disabled={values.participants.length >= LIMITS.maxParticipants}
-          className="ml-2 rounded border border-neutral-300 px-3 py-2 text-sm disabled:opacity-50"
-        >
-          {t('import.button')}
-        </button>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={addParticipant}
+            disabled={values.participants.length >= LIMITS.maxParticipants}
+            className="btn btn-secondary"
+          >
+            {t('participants.add')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setImporting(true)}
+            disabled={values.participants.length >= LIMITS.maxParticipants}
+            className="btn btn-secondary"
+          >
+            {t('import.button')}
+          </button>
+        </div>
         {importing && (
           <ImportDialog
             existingEmails={values.participants.map((p) => p.email)}
@@ -389,24 +396,22 @@ export default function PartyForm({ mode, initial, submitting, serverErrors, for
       </section>
 
       {formError && (
-        <p className="text-sm text-red-600" role="alert">
+        <p className="callout callout-error" role="alert">
           {formError}
         </p>
       )}
 
-      <div className="flex gap-3">
-        <button
-          type="submit"
-          disabled={submitting}
-          className="rounded bg-red-700 px-5 py-2 font-medium text-white disabled:opacity-60"
-        >
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-paper/95 backdrop-blur">
+        <div className="mx-auto grid max-w-2xl gap-2 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:flex sm:flex-row-reverse">
+        <button type="submit" disabled={submitting} className="btn btn-primary btn-block sm:w-auto sm:min-w-56">
           {submitting ? t('common.saving') : mode === 'create' ? t('create.submit') : t('common.save')}
         </button>
         {onCancel && (
-          <button type="button" onClick={onCancel} className="rounded border border-neutral-300 px-5 py-2">
+          <button type="button" onClick={onCancel} className="btn btn-neutral btn-block sm:w-auto sm:min-w-32">
             {t('common.cancel')}
           </button>
         )}
+        </div>
       </div>
     </form>
   )

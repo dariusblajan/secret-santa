@@ -17,8 +17,8 @@ export default function CreatePartyPage() {
   const initial = emptyPartyForm(i18n.language === 'ro' ? 'ro' : ('en' as Locale))
 
   return (
-    <section className="space-y-6">
-      <h2 className="text-2xl font-semibold">{t('create.title')}</h2>
+    <section className="grid gap-6">
+      <h2 className="page-title">{t('create.title')}</h2>
       <PartyForm
         mode="create"
         initial={initial}

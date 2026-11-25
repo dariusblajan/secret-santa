@@ -55,38 +55,38 @@ export default function RevealPage() {
     }
   }, [token])
 
-  if (state === 'loading') return <p>{t('common.loading')}</p>
-  if (state === 'notFound') return <p>{t('reveal.notFound')}</p>
-  if (state === 'error' || !data) return <p role="alert">{t('reveal.loadError')}</p>
+  if (state === 'loading') return <p className="note">{t('common.loading')}</p>
+  if (state === 'notFound') return <p className="callout callout-warn">{t('reveal.notFound')}</p>
+  if (state === 'error' || !data) return <p className="callout callout-error" role="alert">{t('reveal.loadError')}</p>
 
   const { party } = data
   return (
-    <section className="space-y-8">
-      <h2 className="text-2xl font-semibold">{t('reveal.greeting', { name: data.you })}</h2>
+    <section className="grid gap-6">
+      <h2 className="page-title">{t('reveal.greeting', { name: data.you })}</h2>
 
       {data.remade && (
         <div
           role="status"
-          className="rounded border border-amber-500 bg-amber-50 p-3 text-sm text-amber-950 dark:bg-amber-950 dark:text-amber-50"
+          className="callout callout-warn"
         >
           ⚠️ <strong>{t('reveal.remadeTitle')}</strong> {t('reveal.remadeBody')}
         </div>
       )}
 
       {shown ? (
-        <div className="reveal-pop space-y-4 rounded border border-red-700 bg-red-50 p-6 text-center text-red-950 dark:bg-red-950 dark:text-red-50">
+        <div className="reveal-pop grid gap-4 rounded-2xl border-2 border-berry bg-surface p-6 text-center shadow-[0_4px_0_var(--color-berry)]">
           <p className="text-sm">{t('reveal.buyingFor')}</p>
-          <p className="text-3xl font-bold break-words">🎁 {data.giftee}</p>
+          <p className="font-display text-3xl font-bold break-words text-berry">🎁 {data.giftee}</p>
           {data.themeId && (
             <p className="text-sm">
               {t('reveal.theme')}: <strong>{data.themeLabel ?? themeLabel(data.themeId, uiLocale)}</strong>
             </p>
           )}
-          <p className="text-xs opacity-80">{t('reveal.secret')}</p>
+          <p className="note">{t('reveal.secret')}</p>
           <button
             type="button"
             onClick={() => setShown(false)}
-            className="text-xs underline opacity-80"
+            className="btn btn-neutral btn-sm mx-auto"
           >
             {t('reveal.hide')}
           </button>
@@ -98,30 +98,28 @@ export default function RevealPage() {
             rememberRevealed(token, data.drawVersion)
             setShown(true)
           }}
-          className="flex min-h-48 w-full flex-col items-center justify-center gap-3 rounded border-2 border-dashed border-red-700 bg-red-50 p-6 text-red-950 active:scale-[0.98] dark:bg-red-950 dark:text-red-50"
+          className="flex min-h-56 w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-berry bg-surface p-6 text-ink active:scale-[0.98]"
         >
-          <span className="text-6xl" aria-hidden="true">
-            🎁
-          </span>
-          <span className="text-lg font-semibold">{t('reveal.tapToReveal')}</span>
-          <span className="text-xs opacity-80">{t('reveal.tapHint')}</span>
+          <img src={`${import.meta.env.BASE_URL}icon.png`} alt="" className="h-24 w-24" />
+          <span className="font-display text-xl font-bold">{t('reveal.tapToReveal')}</span>
+          <span className="note">{t('reveal.tapHint')}</span>
         </button>
       )}
 
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold">🎄 {party.name}</h3>
-        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-          <dt className="text-neutral-500">{t('manage.when')}</dt>
+      <div className="card">
+        <h3 className="card-title">🎄 {party.name}</h3>
+        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-[15px]">
+          <dt className="font-bold text-muted">{t('manage.when')}</dt>
           <dd>{formatEventDateTime(party.eventAt, uiLocale)}</dd>
-          <dt className="text-neutral-500">{t('manage.location')}</dt>
+          <dt className="font-bold text-muted">{t('manage.location')}</dt>
           <dd>{party.locationName}</dd>
           {party.budgetAmount !== null && (
             <>
-              <dt className="text-neutral-500">{t('manage.budget')}</dt>
+              <dt className="font-bold text-muted">{t('manage.budget')}</dt>
               <dd>{formatBudget(party.budgetAmount, party.locale)}</dd>
             </>
           )}
-          <dt className="text-neutral-500">{t('reveal.whosComing')}</dt>
+          <dt className="font-bold text-muted">{t('reveal.whosComing')}</dt>
           <dd>{data.participantNames.join(', ')}</dd>
         </dl>
       </div>

@@ -88,40 +88,40 @@ export default function StartPanel({ token, data, onChange }: Props) {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="grid gap-6">
       {redo && (
-        <div className="space-y-1">
-          <h3 className="text-xl font-semibold">{t('redo.title')}</h3>
-          <p className="text-sm text-neutral-600">{t('redo.intro')}</p>
+        <div className="grid gap-1">
+          <h3 className="page-title !text-2xl">{t('redo.title')}</h3>
+          <p className="note">{t('redo.intro')}</p>
         </div>
       )}
-      <fieldset className="space-y-2">
-        <legend className="text-lg font-semibold">{t('matching.title')}</legend>
-        <label className="flex items-center gap-2">
-          <input type="radio" name="matching" checked={!sameGender} onChange={() => setSameGender(false)} />
+      <fieldset className="card gap-2">
+        <legend className="card-title float-left mb-2 w-full">{t('matching.title')}</legend>
+        <label className="flex min-h-11 items-center gap-3">
+          <input className="h-5 w-5 accent-berry" type="radio" name="matching" checked={!sameGender} onChange={() => setSameGender(false)} />
           {t('matching.mixed')}
         </label>
-        <label className="flex items-center gap-2">
-          <input type="radio" name="matching" checked={sameGender} onChange={() => setSameGender(true)} />
+        <label className="flex min-h-11 items-center gap-3">
+          <input className="h-5 w-5 accent-berry" type="radio" name="matching" checked={sameGender} onChange={() => setSameGender(true)} />
           {t('matching.sameGender')}
         </label>
-        {sameGender && <p className="text-xs text-neutral-500">{t('matching.sameGenderHint')}</p>}
+        {sameGender && <p className="note">{t('matching.sameGenderHint')}</p>}
       </fieldset>
 
-      <section className="space-y-3">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h3 className="text-lg font-semibold">{t('themes.title')}</h3>
-          <div className="flex gap-3 text-sm">
-            <button type="button" className="underline" onClick={() => updateThemes(THEMES.map((x) => x.id))}>
+      <section className="card">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="card-title">{t('themes.title')}</h3>
+          <div className="flex gap-2">
+            <button type="button" className="btn btn-neutral btn-sm" onClick={() => updateThemes(THEMES.map((x) => x.id))}>
               {t('themes.selectAll')}
             </button>
-            <button type="button" className="underline" onClick={() => updateThemes([])}>
+            <button type="button" className="btn btn-neutral btn-sm" onClick={() => updateThemes([])}>
               {t('themes.selectNone')}
             </button>
           </div>
         </div>
-        <p className="text-xs text-neutral-500">{t('themes.hint')}</p>
-        <p className="text-sm" role="status">
+        <p className="note">{t('themes.hint')}</p>
+        <p className="pill w-fit" role="status">
           {t('themes.counter', { selected: themeIds.length, needed: participants.length })}
         </p>
         <input
@@ -130,7 +130,7 @@ export default function StartPanel({ token, data, onChange }: Props) {
           onChange={(e) => setSearch(e.target.value)}
           aria-label={t('themes.search')}
           placeholder={t('themes.search')}
-          className="w-full rounded border border-neutral-300 px-3 py-1 text-sm"
+          className="input"
         />
         <ul className="flex flex-wrap gap-2">
           {[...THEMES.map((x) => ({ id: x.id, custom: false })), ...customThemes.map((x) => ({ id: x.id, custom: true }))]
@@ -143,10 +143,10 @@ export default function StartPanel({ token, data, onChange }: Props) {
                   type="button"
                   aria-pressed={on}
                   onClick={() => toggleTheme(theme.id)}
-                  className={`rounded-full border px-3 py-1 text-sm ${
+                  className={`min-h-11 rounded-full border-[1.5px] px-4 text-sm font-bold ${
                     on
-                      ? 'border-red-700 bg-red-700 text-white'
-                      : 'border-neutral-300 text-neutral-600 hover:border-neutral-500'
+                      ? 'border-berry bg-berry text-white'
+                      : 'border-line bg-surface text-muted hover:border-[#c9b9a5]'
                   }`}
                 >
                   {themeLabel(theme.id, uiLocale, customThemes)}
@@ -156,7 +156,7 @@ export default function StartPanel({ token, data, onChange }: Props) {
                     type="button"
                     aria-label={t('themes.remove', { name: themeLabel(theme.id, uiLocale, customThemes) })}
                     onClick={() => customAction(() => api.removeTheme(token, theme.id))}
-                    className="-ml-2 rounded-r-full border border-l-0 border-neutral-300 px-2 text-sm text-neutral-600 hover:text-red-700"
+                    className="-ml-2 min-h-11 rounded-r-full border-[1.5px] border-l-0 border-line bg-surface px-3 text-base font-bold text-muted hover:text-danger"
                   >
                     ×
                   </button>
@@ -165,35 +165,35 @@ export default function StartPanel({ token, data, onChange }: Props) {
             )
           })}
         </ul>
-        <form onSubmit={addCustom} className="flex flex-wrap gap-2">
+        <form onSubmit={addCustom} className="grid gap-2 sm:grid-cols-[1fr_auto]">
           <input
             value={newLabel}
             onChange={(e) => setNewLabel(e.target.value)}
             maxLength={CUSTOM_THEME_LIMITS.maxLabelLength}
             aria-label={t('themes.customLabel')}
             placeholder={t('themes.customPlaceholder')}
-            className="min-w-0 flex-1 rounded border border-neutral-300 px-3 py-1 text-sm"
+            className="input min-w-0"
           />
           <button
             type="submit"
             disabled={!newLabel.trim() || customThemes.length >= CUSTOM_THEME_LIMITS.maxCount}
-            className="rounded border border-neutral-300 px-3 py-1 text-sm disabled:opacity-50"
+            className="btn btn-secondary"
           >
             {t('themes.add')}
           </button>
         </form>
-        <p className="text-xs text-neutral-500">{t('themes.customHint', { max: CUSTOM_THEME_LIMITS.maxCount })}</p>
+        <p className="note">{t('themes.customHint', { max: CUSTOM_THEME_LIMITS.maxCount })}</p>
       </section>
 
       <ExclusionsPanel token={token} data={data} onChange={onChange} />
 
-      <div className="space-y-3">
+      <div className="grid gap-3">
         {blocked && (
           <div
             role="status"
-            className="space-y-1 rounded border border-amber-500 bg-amber-50 p-3 text-sm text-amber-950 dark:bg-amber-950 dark:text-amber-50"
+            className="callout callout-warn grid gap-1"
           >
-            <p className="font-medium">⚠️ {t(`${k}.warningTitle`)}</p>
+            <p className="font-bold">⚠️ {t(`${k}.warningTitle`)}</p>
             <ul className="list-disc space-y-1 pl-5">
               {issues.map((issue, i) => (
                 <li key={i}>{issueMessage(t, issue)}</li>
@@ -202,12 +202,12 @@ export default function StartPanel({ token, data, onChange }: Props) {
           </div>
         )}
         {done && (
-          <p className="text-sm text-green-700" role="status">
+          <p className="callout callout-ok font-bold" role="status">
             ✓ {t('redo.done')}
           </p>
         )}
         {error && (
-          <p className="text-sm text-red-600" role="alert">
+          <p className="callout callout-error" role="alert">
             {error}
           </p>
         )}
@@ -215,7 +215,7 @@ export default function StartPanel({ token, data, onChange }: Props) {
           type="button"
           disabled={blocked || starting}
           onClick={() => setConfirming(true)}
-          className="rounded bg-red-700 px-5 py-2 font-medium text-white disabled:opacity-50"
+          className="btn btn-primary btn-block sm:w-auto sm:min-w-56 sm:justify-self-end"
         >
           {starting ? t('start.starting') : t(`${k}.button`)}
         </button>
@@ -223,26 +223,26 @@ export default function StartPanel({ token, data, onChange }: Props) {
 
       {confirming && (
         <div
-          className="fixed inset-0 z-10 flex items-center justify-center bg-black/50 p-4"
+          className="modal-backdrop"
           onKeyDown={(e) => e.key === 'Escape' && !starting && setConfirming(false)}
         >
           <div
             role="dialog"
             aria-modal="true"
             aria-labelledby="start-title"
-            className="w-full max-w-md space-y-4 rounded bg-white p-6 text-neutral-900 shadow-lg"
+            className="modal grid max-w-md gap-4"
           >
-            <h3 id="start-title" className="text-lg font-semibold">
+            <h3 id="start-title" className="card-title">
               {t(`${k}.dialogTitle`)}
             </h3>
-            <p className="text-sm">{t(`${k}.dialogBody`, { count: participants.length })}</p>
-            <div className="flex justify-end gap-3">
+            <p className="text-[15px]">{t(`${k}.dialogBody`, { count: participants.length })}</p>
+            <div className="grid grid-cols-2 gap-3 sm:flex sm:justify-end">
               <button
                 ref={cancelRef}
                 type="button"
                 disabled={starting}
                 onClick={() => setConfirming(false)}
-                className="rounded border border-neutral-300 px-4 py-2"
+                className="btn btn-neutral"
               >
                 {t('start.dialogCancel')}
               </button>
@@ -250,7 +250,7 @@ export default function StartPanel({ token, data, onChange }: Props) {
                 type="button"
                 disabled={starting}
                 onClick={() => void start()}
-                className="rounded bg-red-700 px-4 py-2 font-medium text-white disabled:opacity-60"
+                className="btn btn-primary"
               >
                 {starting ? t('start.starting') : t(`${k}.dialogConfirm`)}
               </button>

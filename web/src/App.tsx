@@ -10,16 +10,16 @@ import RevealPage from './pages/RevealPage'
 function LanguageSwitcher() {
   const { t, i18n } = useTranslation()
   return (
-    <label className="flex items-center gap-2 text-sm">
+    <label className="flex items-center">
       <span className="sr-only">{t('language.label')}</span>
       <select
         value={i18n.language}
         onChange={(e) => setLanguage(e.target.value as Language)}
-        className="rounded border border-neutral-300 bg-transparent px-2 py-1"
+        className="h-10 cursor-pointer appearance-none rounded-full border-[1.5px] border-white bg-transparent bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2212%22%20height=%228%22%20viewBox=%220%200%2012%208%22%3E%3Cpath%20d=%22M1%201l5%205%205-5%22%20fill=%22none%22%20stroke=%22%23fff%22%20stroke-width=%222%22/%3E%3C/svg%3E')] bg-[length:12px_8px] bg-[right_12px_center] bg-no-repeat pr-8 pl-3.5 text-sm font-bold text-white"
         aria-label={t('language.label')}
       >
         {LANGUAGES.map((lang) => (
-          <option key={lang} value={lang}>
+          <option key={lang} value={lang} className="text-ink">
             {t(`language.${lang}`)}
           </option>
         ))}
@@ -47,8 +47,8 @@ function HealthStatus() {
   }, [])
 
   return (
-    <p className="text-sm text-neutral-500" role="status">
-      <span className="font-medium">{t('health.title')}:</span> {t(`health.${state}`)}
+    <p className="note" role="status">
+      <span className="font-bold">{t('health.title')}:</span> {t(`health.${state}`)}
     </p>
   )
 }
@@ -56,10 +56,11 @@ function HealthStatus() {
 function Home() {
   const { t } = useTranslation()
   return (
-    <section className="space-y-6">
-      <h2 className="text-2xl font-semibold">{t('home.welcome')}</h2>
-      <p>{t('home.intro')}</p>
-      <Link to="/create" className="inline-block rounded bg-red-700 px-5 py-2 font-medium text-white">
+    <section className="card gap-5 p-6 text-center">
+      <img src={`${import.meta.env.BASE_URL}icon.png`} alt="" className="mx-auto h-28 w-28" />
+      <h2 className="page-title">{t('home.welcome')}</h2>
+      <p className="mx-auto max-w-prose text-muted">{t('home.intro')}</p>
+      <Link to="/create" className="btn btn-primary btn-block sm:mx-auto sm:w-auto sm:min-w-56">
         {t('home.create')}
       </Link>
       <HealthStatus />
@@ -70,9 +71,9 @@ function Home() {
 function NotFound() {
   const { t } = useTranslation()
   return (
-    <section className="space-y-4">
-      <h2 className="text-2xl font-semibold">{t('notFound.title')}</h2>
-      <Link to="/" className="underline">
+    <section className="grid gap-4">
+      <h2 className="page-title">{t('notFound.title')}</h2>
+      <Link to="/" className="btn btn-neutral sm:w-fit">
         {t('notFound.back')}
       </Link>
     </section>
@@ -82,14 +83,25 @@ function NotFound() {
 export default function App() {
   const { t } = useTranslation()
   return (
-    <div className="mx-auto flex min-h-screen max-w-2xl flex-col px-4">
-      <header className="flex items-center justify-between border-b border-neutral-200 py-4">
-        <Link to="/" className="text-lg font-bold">
-          🎁 {t('app.title')}
-        </Link>
-        <LanguageSwitcher />
+    <div className="flex min-h-screen flex-col">
+      <header className="relative bg-berry text-white shadow-sm">
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-4 py-3">
+          <Link to="/" className="flex min-h-11 items-center gap-2.5 font-display text-xl font-bold text-white no-underline">
+            <img
+              src={`${import.meta.env.BASE_URL}icon.png`}
+              alt=""
+              className="h-9 w-9 rounded-[10px] bg-[#fff8ee] p-0.5"
+            />
+            {t('app.title')}
+          </Link>
+          <LanguageSwitcher />
+        </div>
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 -bottom-1.5 h-1.5 bg-[repeating-linear-gradient(135deg,var(--color-pine)_0_14px,var(--color-gold)_14px_28px)]"
+        />
       </header>
-      <main className="flex-1 py-8">
+      <main className="mx-auto w-full max-w-2xl flex-1 px-4 pt-10 pb-8">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/create" element={<CreatePartyPage />} />
@@ -98,7 +110,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      <footer className="py-4 text-center text-xs text-neutral-500">{t('app.tagline')}</footer>
+      <footer className="px-4 py-6 text-center text-xs text-muted">{t('app.tagline')}</footer>
     </div>
   )
 }
