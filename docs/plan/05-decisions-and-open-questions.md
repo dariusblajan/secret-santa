@@ -39,12 +39,20 @@
 | D33 | Start blockers (same-gender mismatch, too few participants, too few themes) show an amber warning above the Start button and disable it | Confirmed |
 | D34 | Failed invites get a per-person Resend that rotates that person's link | Confirmed |
 | D35 | Custom themes move to Iteration 4 | Predefined list is enough for the first end-to-end run |
+| D36 | Optional **directional** exclusions ("A can't buy for B"), Iteration 5; combined with the matching mode | Confirmed |
+| D37 | Exclusions are editable any time before start and before a redo; the redo honours them | Confirmed |
+| D38 | Infeasible exclusions show the amber pre-flight warning and disable Start/Redo; feasibility is checked with the same search the draw uses | Confirmed |
+| D39 | With exclusions the draw is a random Hamiltonian cycle found by backtracking (n ≤ 15); no exclusions keeps plain Sattolo | Single cycle preserved, behaviour unchanged for parties without exclusions |
+| D40 | Participants import (`.csv`/`.xlsx`/`.xls`, columns name, email, gender B/G) is Iteration 6 and runs in the browser | Confirmed; no new backend, file never uploaded |
+| D41 | Import appends after a preview; bad rows land in the editor with inline error markers; rows over the 15 cap are left out | Confirmed |
 
 ## 5.2 Open questions
 
 1. **Access code:** keep it (recommended: protects your Brevo quota) or drop it and rely on the caps only?
 2. **Opened status (D23):** shown by default. Say so if you'd rather hide it.
 3. **Daily party cap** of 5: fine, or different?
+4. **Import (assumptions to confirm):** headers are required and matched by name (not position); `B`/`G` are the only accepted gender values (not "boy"/"girl"/"M"/"F"); an imported row matching the organizer's email is flagged as a duplicate; rows past the 15 cap are dropped, not queued.
+5. **Exclusions (assumptions to confirm):** the organizer sees the full exclusion list (it's their input, it reveals no match); there is no cap on the number of rules beyond what the draw can satisfy.
 
 ## 5.3 Risks
 
@@ -52,7 +60,7 @@
 |---|---|
 | Emails land in spam (no domain, Gmail sender) | Test early in Iteration 2, advise on cheap domain if needed |
 | Supabase free project pauses after inactivity | Note in README; keep-alive cron or manual unpause before an event |
-| Organizer loses admin link | Re-send flow via organizer email (Iteration 6) |
+| Organizer loses admin link | Re-send flow via organizer email (Iteration 8) |
 | Romanian copy quality | All copy in two JSON files + templates for one-place proofreading |
 | DB owner can read matches | Accepted for a friends-only app, documented |
 | Public repo exposes code | No secrets in repo; all secrets in Supabase/GitHub secrets (doc 6) |

@@ -148,7 +148,48 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 
 ---
 
-## Iteration 6: Reminders
+## Iteration 6: Import participants from a file
+
+**Scope**
+- Import participants from a simple `.csv`, `.xlsx` or `.xls` file into the participants editor.
+- Parsed **in the browser**: the file never leaves the device. The existing save flow and server validation are reused, so there is **no new backend function**.
+- Available in the editor while the party is a draft (create form and manage page), the same window in which participants are editable.
+
+**File format**
+- One header row, columns `name`, `email`, `gender` (header names case-insensitive, trimmed; extra columns ignored). Only the first sheet of a workbook is read.
+- `gender` is optional: `B` = boy, `G` = girl, case-insensitive, empty allowed. Any other value is flagged.
+- CSV: UTF-8 (with or without BOM) and both `,` and `;` delimiters (Romanian Excel exports `;`). Fully empty rows are ignored.
+- A downloadable template file (name, email, gender) sits next to the import button.
+
+**Flow**
+1. In the participants editor → **Import from file** → pick a file (or drag and drop).
+2. **Preview** dialog: how many rows were read, how many look valid, and a table with row numbers and per-row problems (invalid email, duplicate email within the file or against the editor, bad gender value, missing name).
+3. **Add to list** appends the rows after the existing entries. The organizer's own entry stays first. Nothing is saved yet; the organizer reviews in the editor and uses the normal save.
+4. Problem rows are added too, with the **inline error markers** the editor already has, so the organizer fixes them in place instead of editing the file and re-importing.
+5. Rows that would exceed the 15-participant cap are not added; the dialog says how many were left out.
+
+**UI**
+- Import button, template link, drag-and-drop zone
+- Preview dialog with the row-level problem table
+- Inline error markers on imported rows (reuses the editor's duplicate-email and required-field errors)
+- All copy in ro and en
+
+**Behaviour**
+- Dedicated parsing module in `web/src/lib/` with a pure function `parseParticipantsFile(rows)`, so Vitest can test it without a browser. The xlsx parsing library (e.g. SheetJS) is loaded lazily, only when the dialog opens, to keep the main bundle small.
+- File size cap (a few hundred KB) and a row cap; parsing failures show a friendly error ("could not read this file").
+- Email normalisation (trim, lowercase) matches the editor, and the same shared validators from `_shared` are used.
+- Rows are imported as plain text only. Spreadsheet formulas are never evaluated, and cell values starting with `=`, `+`, `-` or `@` are kept as text.
+- If same-gender matching is on and gender is missing, the usual pre-flight warning still applies at start; import does not enforce it.
+
+**Done when**
+- Parser tests pass: header variants, `B`/`G`/`b`/`g`/empty, unknown gender, `;` and `,` CSV, BOM, empty rows, duplicate emails (in file and against existing), more than 15 rows, wrong columns.
+- A `.csv`, `.xlsx` and `.xls` sample each import to the same preview.
+- Imported rows keep the organizer first and respect the cap; nothing persists until save.
+- Server-side validation still rejects bad data if the browser is bypassed.
+
+---
+
+## Iteration 7: Reminders
 
 **Flow**
 1. Manage page → Reminders: pick a preset (countdown, budget, your match, last call, theme nudge) or write a custom message.
@@ -169,7 +210,7 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 
 ---
 
-## Iteration 7: Hardening and polish
+## Iteration 8: Hardening and polish
 
 **Scope**
 - Rate limiting, participant/party caps, input sanitising in emails (HTML escaping).

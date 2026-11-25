@@ -45,12 +45,16 @@ https://<project-ref>.supabase.co/functions/v1/<function-name>
 | Function | Auth | Request | Response |
 |---|---|---|---|
 | `create-party` | access code | party fields, participants | party id, sends `admin_link` email |
-| `manage-party` (`get`/`update`) | admin token | party/participant/theme edits | party + participants + statuses (no matches) |
-| `start-draw` | admin token | `{ sameGender, redo? }` | status; sends `invite` or `redo` emails |
+| `manage-party` (`get`/`update`) | admin token | party/participant/theme/exclusion edits (imported participants arrive as an ordinary participant list) | party + participants + exclusions + statuses (no matches) |
+| `start-draw` | admin token | `{ sameGender, redo? }` | status; sends `invite` or `redo` emails. Draws using the party's stored exclusions; errors with a typed reason (`no_allowed_giftee`, `no_valid_cycle`, ...) if infeasible |
 | `reveal` | reveal token | `{}` | own giftee, theme, party info, names, `drawVersion`, `remade` flag |
 | `send-reminder` | admin token (manual) / service key (cron) | `{ kind, customMessage? }` | sent count |
 | `resend-link` | email + party id | | re-sends admin or reveal link (rate-limited) |
 | `cleanup` | service key (cron) | | deletes expired parties |
+
+Notes:
+- **Exclusions** are saved through `manage-party` (add/remove a `{ giverId, gifteeId }` pair). The server rejects self-pairs, duplicates, participants from another party, and edits when the party is not in `draft` or `drawn` status or the event date has passed. The infeasibility pre-flight uses the shared `_shared/draw.ts` check in the browser, and `start-draw` re-checks on the server.
+- **Participants import** has no endpoint: the file is parsed in the browser and the rows go through the same `manage-party` / `create-party` participant list as manual entry, with the same server-side validation.
 
 All functions validate input with Zod, return typed errors (`{ code, message }`) that the UI maps to translated messages, and log without printing tokens or emails.
 

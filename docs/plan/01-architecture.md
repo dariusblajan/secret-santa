@@ -27,6 +27,7 @@ Pages quirks to handle:
 | Routing | React Router (`HashRouter`) | |
 | Data fetching | TanStack Query | |
 | Forms | React Hook Form + Zod | Same Zod schemas can validate on the server |
+| File import | xlsx/csv parser (e.g. SheetJS), lazy-loaded in `web/` | Participants import runs in the browser only, see doc 2.6 |
 | i18n | react-i18next | en + ro, see doc 3 |
 | Backend | Supabase | Postgres + Edge Functions (Deno/TS) + `pg_cron` |
 | Email | Brevo (free tier, 300/day) | Single-sender verification, no domain needed |
@@ -48,15 +49,15 @@ secret-santa/
 │  │  ├─ i18n/                # en.json, ro.json
 │  │  ├─ pages/
 │  │  ├─ components/
-│  │  └─ lib/                 # API client, hooks
+│  │  └─ lib/                 # API client, hooks, participants file parser
 │  └─ vite.config.ts
 ├─ supabase/                  # backend → Supabase
 │  ├─ config.toml
 │  ├─ migrations/             # schema, RLS, pg_cron jobs
 │  └─ functions/
 │     ├─ create-party/
-│     ├─ manage-party/        # get/update party + participants (admin token)
-│     ├─ start-draw/          # draw + redo + invite/redo emails
+│     ├─ manage-party/        # get/update party + participants + exclusions (admin token)
+│     ├─ start-draw/          # draw (honouring exclusions) + redo + invite/redo emails
 │     ├─ reveal/              # participant token → own match only
 │     ├─ send-reminder/       # manual + scheduled
 │     ├─ cleanup/             # retention job
@@ -66,14 +67,14 @@ secret-santa/
    └─ deploy-backend.yml      # paths: supabase/**
 ```
 
-`_shared/draw.ts` is pure TypeScript (no Deno-only APIs) so Vitest can test it and, if useful, `web/` can import it for pre-flight validation.
+`_shared/draw.ts` is pure TypeScript (no Deno-only APIs) so Vitest can test it and, if useful, `web/` can import it for pre-flight validation, including the exclusions feasibility check.
 
 ## 1.4 Identity and access (no accounts)
 
 | Actor | Credential | Can do |
 |---|---|---|
 | Anyone creating a party | Shared **access code** (env secret on the function), see 1.5 | Create a party |
-| Organizer | **Admin token** in link `/#/manage/<token>` (emailed + remembered in browser) | Edit participants/themes, start/redo draw, send reminders |
+| Organizer | **Admin token** in link `/#/manage/<token>` (emailed + remembered in browser) | Edit participants/themes/exclusions, import participants, start/redo draw, send reminders |
 | Participant | **Reveal token** in link `/#/reveal/<token>` (emailed) | See party details, participant names, **own** match and theme |
 
 Rules:
@@ -85,6 +86,8 @@ Rules:
 
 - **RLS on, no direct table access** from the anon key. The browser talks only to Edge Functions (or tightly scoped RPCs).
 - Assignments (`assigned_to`, `theme`) are only returned by `reveal`, filtered to the token's owner.
+- Exclusions ("A can't buy for B") are organizer input, not results: `manage-party` may return them. They narrow the possible matches but are never shown to participants.
+- Imported participant files are parsed in the browser and never uploaded; only the resulting participant list goes through the normal save call.
 - The Supabase project owner could technically read the DB. That is accepted. The app UI and APIs never expose matches to the organizer.
 - Abuse guards (private app, so deliberately light):
   - **Access code** required to create a party. Purpose: the site URL and the Supabase endpoint are public, so without a gate anyone who finds them could create parties and make the app send emails to arbitrary addresses, burning your Brevo quota (300/day) and your sender reputation. The code is one shared secret you give to people you trust. It's a single env var and a single input field, so it's easy to drop if you'd rather not have it (the caps below would then be the only guard).
