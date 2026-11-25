@@ -184,6 +184,31 @@
     "rule": "{{giver}} nu poate cumpăra pentru {{giftee}}",
     "remove": "Șterge regula: {{giver}} nu poate cumpăra pentru {{giftee}}"
   },
+  "import": {
+    "button": "Importă din fișier",
+    "title": "Importă participanți",
+    "help": "Folosește un fișier .csv cu coloanele name, email și gender (B = băiat, G = fată, gender este opțional). Fișierul este citit în browser și nu este încărcat nicăieri.",
+    "template": "Descarcă șablonul",
+    "drop": "Trage un fișier aici sau apasă pentru a alege unul",
+    "summary": "{{read}} rânduri citite, {{valid}} par valide.",
+    "leftOut": "{{count}} rânduri nu încap (maximum 15 participanți) și vor fi lăsate deoparte.",
+    "problems": "Probleme",
+    "add": "Adaugă în listă",
+    "problem": {
+      "missing_name": "Nume lipsă sau prea lung",
+      "invalid_email": "Email invalid",
+      "duplicate_email": "Email duplicat",
+      "bad_gender": "Genul trebuie să fie B sau G (ignorat)"
+    },
+    "errors": {
+      "wrong_columns": "Primul rând trebuie să conțină coloanele name și email (gender este opțional).",
+      "empty": "Nu s-au găsit participanți în acest fișier.",
+      "too_many_rows": "Acest fișier are prea multe rânduri.",
+      "too_big": "Acest fișier este prea mare.",
+      "unsupported": "Sunt acceptate doar fișiere .csv.",
+      "unreadable": "Nu am putut citi acest fișier."
+    }
+  },
   "reveal": {
     "greeting": "Salut, {{name}}!",
     "buyingFor": "Cumperi un cadou pentru",

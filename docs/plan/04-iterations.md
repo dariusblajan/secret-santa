@@ -154,6 +154,8 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 
 ## Iteration 6: Import participants from a file
 
+> **Status:** `.csv` import is built. `.xlsx` / `.xls` support is pending: it needs the SheetJS library (see the lazy-loading note below), which was not installed yet.
+
 **Scope**
 - Import participants from a simple `.csv`, `.xlsx` or `.xls` file into the participants editor.
 - Parsed **in the browser**: the file never leaves the device. The existing save flow and server validation are reused, so there is **no new backend function**.

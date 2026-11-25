@@ -7,6 +7,8 @@ import {
   type Locale,
   type ValidationError,
 } from '../../../supabase/functions/_shared/validation.ts'
+import ImportDialog from './ImportDialog'
+import type { ImportRow } from '../lib/participantsImport'
 import { errorMessage } from '../lib/errors'
 import { toPartyInput, type PartyFormValues } from '../lib/partyForm'
 
@@ -48,6 +50,7 @@ export default function PartyForm({ mode, initial, submitting, serverErrors, for
   const [accessCode, setAccessCode] = useState('')
   const [clientErrors, setClientErrors] = useState<ValidationError[]>([])
   const [accessCodeMissing, setAccessCodeMissing] = useState(false)
+  const [importing, setImporting] = useState(false)
 
   const errors = [...clientErrors, ...(serverErrors ?? [])]
   const errorFor = (field: string): string | undefined => {
@@ -69,6 +72,19 @@ export default function PartyForm({ mode, initial, submitting, serverErrors, for
 
   const removeParticipant = (index: number) =>
     setValues((v) => ({ ...v, participants: v.participants.filter((_, i) => i !== index) }))
+
+  // Imported rows are appended after the existing entries (the organizer stays first). Nothing is saved yet;
+  // participant-level errors are shown right away so problem rows can be fixed in place.
+  function addImported(rows: ImportRow[]) {
+    const kept = values.participants.filter((p, i) => i === 0 || p.name.trim() !== '' || p.email.trim() !== '')
+    const next = {
+      ...values,
+      participants: [...kept, ...rows.map((r) => ({ name: r.name, email: r.email, gender: r.gender }))],
+    }
+    setValues(next)
+    setClientErrors(validateParty(toPartyInput(next)).filter((e) => e.field.startsWith('participants.')))
+    setImporting(false)
+  }
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -274,6 +290,22 @@ export default function PartyForm({ mode, initial, submitting, serverErrors, for
         >
           + {t('participants.add')}
         </button>
+        <button
+          type="button"
+          onClick={() => setImporting(true)}
+          disabled={values.participants.length >= LIMITS.maxParticipants}
+          className="ml-2 rounded border border-neutral-300 px-3 py-2 text-sm disabled:opacity-50"
+        >
+          {t('import.button')}
+        </button>
+        {importing && (
+          <ImportDialog
+            existingEmails={values.participants.map((p) => p.email)}
+            currentCount={values.participants.filter((p, i) => i === 0 || p.name.trim() !== '' || p.email.trim() !== '').length}
+            onAdd={addImported}
+            onClose={() => setImporting(false)}
+          />
+        )}
       </section>
 
       {formError && (

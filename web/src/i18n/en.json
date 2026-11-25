@@ -183,6 +183,31 @@
     "rule": "{{giver}} can't buy for {{giftee}}",
     "remove": "Remove rule: {{giver}} can't buy for {{giftee}}"
   },
+  "import": {
+    "button": "Import from file",
+    "title": "Import participants",
+    "help": "Use a .csv file with the columns name, email and gender (B = boy, G = girl, gender is optional). The file is read in your browser and never uploaded.",
+    "template": "Download the template",
+    "drop": "Drop a file here or click to choose one",
+    "summary": "{{read}} rows read, {{valid}} look valid.",
+    "leftOut": "{{count}} rows won't fit (maximum 15 participants) and will be left out.",
+    "problems": "Problems",
+    "add": "Add to list",
+    "problem": {
+      "missing_name": "Missing or too long name",
+      "invalid_email": "Invalid email",
+      "duplicate_email": "Duplicate email",
+      "bad_gender": "Gender must be B or G (ignored)"
+    },
+    "errors": {
+      "wrong_columns": "The first row must have the columns name and email (gender is optional).",
+      "empty": "No participants found in this file.",
+      "too_many_rows": "This file has too many rows.",
+      "too_big": "This file is too big.",
+      "unsupported": "Only .csv files are supported.",
+      "unreadable": "Could not read this file."
+    }
+  },
   "reveal": {
     "greeting": "Hi {{name}}!",
     "buyingFor": "You are buying a gift for",
