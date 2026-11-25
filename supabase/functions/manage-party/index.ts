@@ -1,10 +1,10 @@
 import { sendEmail } from '../_shared/brevo.ts'
 import { json, preflight } from '../_shared/cors.ts'
 import { adminClient } from '../_shared/db.ts'
-import { checkDrawable, checkThemes, drawAssignments, type DrawIssue } from '../_shared/draw.ts'
+import { checkDrawable, checkThemes, drawAssignments, type DrawExclusion, type DrawIssue } from '../_shared/draw.ts'
 import { inviteEmail } from '../_shared/emails/invite.ts'
 import { redoEmail } from '../_shared/emails/redo.ts'
-import { serializeManage, type ParticipantRow, type PartyRow } from '../_shared/serialize.ts'
+import { serializeManage, type ExclusionRow, type ParticipantRow, type PartyRow } from '../_shared/serialize.ts'
 import {
   dealThemes,
   newCustomThemeId,
@@ -44,12 +44,25 @@ async function loadRows(db: Db, adminHash: string) {
     .eq('party_id', party.id)
     .order('position')
   if (pError) throw pError
-  return { party: party as PartyRow, participants: (participants ?? []) as ParticipantRow[] }
+  const { data: exclusions, error: xError } = await db
+    .from('party_exclusions')
+    .select('giver_id, giftee_id')
+    .eq('party_id', party.id)
+    .order('created_at')
+  if (xError) throw xError
+  return {
+    party: party as PartyRow,
+    participants: (participants ?? []) as ParticipantRow[],
+    exclusions: (exclusions ?? []) as ExclusionRow[],
+  }
 }
+
+const toDrawExclusions = (rows: ExclusionRow[]): DrawExclusion[] =>
+  rows.map((x) => ({ giverId: x.giver_id, gifteeId: x.giftee_id }))
 
 async function load(db: Db, adminHash: string) {
   const rows = await loadRows(db, adminHash)
-  return rows ? serializeManage(rows.party, rows.participants) : null
+  return rows ? serializeManage(rows.party, rows.participants, rows.exclusions) : null
 }
 
 /**
@@ -199,22 +212,58 @@ Deno.serve(async (req) => {
       return data ? json(req, data) : notFound(req)
     }
 
+    // ---- exclusions: "giver can't buy for giftee" (draft or drawn) --------------
+    if (body.action === 'add-exclusion') {
+      const rows = await loadRows(db, adminHash)
+      if (!rows) return notFound(req)
+      const ids = new Set(rows.participants.map((p) => p.id))
+      const giverId = body.giverId
+      const gifteeId = body.gifteeId
+      if (typeof giverId !== 'string' || typeof gifteeId !== 'string' || !ids.has(giverId) || !ids.has(gifteeId)) {
+        return json(req, { code: 'validation_failed', message: 'Unknown participant' }, 422)
+      }
+      if (giverId === gifteeId) return json(req, { code: 'exclusion_self', message: 'Pick two different people' }, 422)
+      if (rows.exclusions.some((x) => x.giver_id === giverId && x.giftee_id === gifteeId)) {
+        return json(req, { code: 'exclusion_duplicate', message: 'Rule already exists' }, 422)
+      }
+      const { error } = await db
+        .from('party_exclusions')
+        .insert({ party_id: rows.party.id, giver_id: giverId, giftee_id: gifteeId })
+      if (error) throw error
+      const data = await load(db, adminHash)
+      return data ? json(req, data) : notFound(req)
+    }
+
+    if (body.action === 'remove-exclusion') {
+      const rows = await loadRows(db, adminHash)
+      if (!rows) return notFound(req)
+      const { error } = await db
+        .from('party_exclusions')
+        .delete()
+        .eq('party_id', rows.party.id)
+        .eq('giver_id', String(body.giverId))
+        .eq('giftee_id', String(body.gifteeId))
+      if (error) throw error
+      const data = await load(db, adminHash)
+      return data ? json(req, data) : notFound(req)
+    }
+
     // ---- start the draw ----------------------------------------------------
     if (body.action === 'start') {
       const rows = await loadRows(db, adminHash)
       if (!rows) return notFound(req)
-      const { party, participants } = rows
+      const { party, participants, exclusions } = rows
       if (party.status !== 'draft') return json(req, { code: 'locked', message: 'Party already started' }, 409)
 
       const sameGender = body.sameGender === true
       const people = participants.map((p) => ({ id: p.id, name: p.name, gender: p.gender }))
       const custom = parseCustomThemes(party.custom_themes)
       const pool = sanitizeThemeIds(party.theme_ids, custom)
-      const issues: DrawIssue[] = [...checkDrawable(people, sameGender), ...checkThemes(pool.length, people.length)]
+      const issues: DrawIssue[] = [...checkDrawable(people, sameGender, toDrawExclusions(exclusions)), ...checkThemes(pool.length, people.length)]
       if (issues.length > 0) return json(req, { code: 'cannot_start', message: 'Cannot start', issues }, 422)
 
       // Decide matches and themes. They exist only in memory and in the database.
-      const giftees = drawAssignments(people, sameGender)
+      const giftees = drawAssignments(people, sameGender, toDrawExclusions(exclusions))
       const themes = dealThemes(pool, people.map((p) => p.id), custom)
 
       // Raw reveal tokens exist only until the emails are sent; the database keeps hashes.
@@ -252,7 +301,7 @@ Deno.serve(async (req) => {
     if (body.action === 'redo') {
       const rows = await loadRows(db, adminHash)
       if (!rows) return notFound(req)
-      const { party, participants } = rows
+      const { party, participants, exclusions } = rows
       if (party.status !== 'drawn') return json(req, { code: 'not_started', message: 'Party not started' }, 409)
       if (new Date(party.event_at).getTime() <= Date.now()) {
         return json(req, { code: 'event_passed', message: 'The event date has passed' }, 409)
@@ -262,10 +311,10 @@ Deno.serve(async (req) => {
       const people = participants.map((p) => ({ id: p.id, name: p.name, gender: p.gender }))
       const custom = parseCustomThemes(party.custom_themes)
       const pool = sanitizeThemeIds(party.theme_ids, custom)
-      const issues: DrawIssue[] = [...checkDrawable(people, sameGender), ...checkThemes(pool.length, people.length)]
+      const issues: DrawIssue[] = [...checkDrawable(people, sameGender, toDrawExclusions(exclusions)), ...checkThemes(pool.length, people.length)]
       if (issues.length > 0) return json(req, { code: 'cannot_start', message: 'Cannot redo', issues }, 422)
 
-      const giftees = drawAssignments(people, sameGender)
+      const giftees = drawAssignments(people, sameGender, toDrawExclusions(exclusions))
       const themes = dealThemes(pool, people.map((p) => p.id), custom)
       const assignments = people.map((p) => ({ id: p.id, giftee_id: giftees[p.id], theme: themes[p.id] }))
 

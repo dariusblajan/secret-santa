@@ -264,3 +264,102 @@ describe('custom themes', () => {
     )
   })
 })
+
+describe('exclusions', () => {
+  const ex = (giverId: string, gifteeId: string) => ({ giverId, gifteeId })
+
+  it('never draws an excluded pair (n = 3..15)', () => {
+    for (let n = 3; n <= 15; n++) {
+      const ps = people(n)
+      const ids = ps.map((p) => p.id)
+      // p0 can't buy for p1, p2 can't buy for p0, p1 can't buy for p2 (a directional triangle).
+      const exclusions = [ex('p0', 'p1'), ex('p2', 'p0'), ex('p1', 'p2')]
+      for (let run = 0; run < (n <= 9 ? 1500 : 60); run++) {
+        const map = drawAssignments(ps, false, exclusions)
+        expect(Object.values(map).sort()).toEqual([...ids].sort())
+        expect(isSingleCycle(map, ids)).toBe(true)
+        for (const [giver, giftee] of Object.entries(map)) {
+          expect(giftee).not.toBe(giver)
+          expect(exclusions).not.toContainEqual(ex(giver, giftee))
+        }
+      }
+    }
+  }, 60_000)
+
+  it('only blocks one direction', () => {
+    const seen = new Set<string>()
+    for (let i = 0; i < 300; i++) {
+      const map = drawAssignments(people(3), false, [ex('p0', 'p1')])
+      seen.add(`${map.p0}`)
+      expect(map.p0).toBe('p2') // the only valid cycle is p0 -> p2 -> p1 -> p0
+    }
+    expect(seen).toEqual(new Set(['p2']))
+  })
+
+  it('stays random among valid cycles', () => {
+    const seen = new Set<string>()
+    for (let i = 0; i < 500; i++) {
+      seen.add(JSON.stringify(Object.entries(drawAssignments(people(4), false, [ex('p0', 'p1')])).sort()))
+    }
+    // 6 four-cycles, 2 use p0->p1 ... 4 remain
+    expect(seen.size).toBe(4)
+  })
+
+  it('combines with same-gender mode', () => {
+    const ps = people(6, ['girl', 'girl', 'girl', 'boy', 'boy', 'boy'])
+    for (let run = 0; run < 300; run++) {
+      const map = drawAssignments(ps, true, [ex('p0', 'p1'), ex('p3', 'p4')])
+      expect(map.p0).toBe('p2')
+      expect(map.p3).toBe('p5')
+      for (const p of ps) expect(ps.find((x) => x.id === map[p.id])!.gender).toBe(p.gender)
+    }
+  })
+
+  it('names someone excluded from everyone else', () => {
+    const ps = people(4)
+    const issues = checkDrawable(ps, false, [ex('p0', 'p1'), ex('p0', 'p2'), ex('p0', 'p3')])
+    expect(issues).toEqual([{ code: 'no_allowed_giftee', name: 'Person 0' }])
+    const received = checkDrawable(ps, false, [ex('p1', 'p0'), ex('p2', 'p0'), ex('p3', 'p0')])
+    expect(received).toEqual([{ code: 'no_allowed_giver', name: 'Person 0' }])
+    expect(() => drawAssignments(ps, false, [ex('p0', 'p1'), ex('p0', 'p2'), ex('p0', 'p3')])).toThrow(DrawError)
+  })
+
+  it('detects a set with no single cycle even though everyone has options', () => {
+    // 4 people: {p0,p1} may only give inside their pair or to p0/p1, so the circle can't close through p2/p3.
+    const ps = people(4)
+    const blocked = [ex('p0', 'p2'), ex('p0', 'p3'), ex('p1', 'p2'), ex('p1', 'p3')]
+    // p0 -> p1 and p1 -> p0 only: two-person loop, not a single cycle.
+    expect(checkDrawable(ps, false, blocked)).toEqual([{ code: 'no_valid_cycle' }])
+  })
+
+  it('blocks a group of 2 when an exclusion breaks the forced swap', () => {
+    const ps = people(5, ['girl', 'girl', 'boy', 'boy', 'boy'])
+    expect(checkDrawable(ps, true, [ex('p0', 'p1')])).toEqual([
+      { code: 'no_allowed_giftee', name: 'Person 0' },
+      { code: 'no_allowed_giver', name: 'Person 1' },
+    ])
+  })
+
+  it('never falsely blocks a feasible set and ignores rules outside the group', () => {
+    expect(checkDrawable(people(5), false, [ex('p0', 'p1'), ex('p1', 'p0')])).toEqual([])
+    const ps = people(5, ['girl', 'girl', 'boy', 'boy', 'boy'])
+    expect(checkDrawable(ps, true, [ex('p0', 'p2'), ex('p3', 'p0')])).toEqual([])
+  })
+
+  it('behaves exactly as before with no exclusions', () => {
+    const ps = people(5)
+    expect(checkDrawable(ps, false, [])).toEqual(checkDrawable(ps, false))
+    expect(isSingleCycle(drawAssignments(ps, false, []), ps.map((p) => p.id))).toBe(true)
+  })
+
+  it('serializeManage returns exclusions but no match fields', () => {
+    const out = serializeManage(
+      { id: 'x', name: 'n', event_at: '', location_name: '', budget_amount: null, locale: 'en', status: 'drawn', draw_version: 1, same_gender_mode: false, theme_ids: [], giftee_id: 'secret' } as PartyRow,
+      [{ id: 'a', name: 'A', email: 'a@x.io', gender: null, is_organizer: true, invited_at: null, revealed_at: null, giftee_id: 'secret', theme: 'cozy' } as ParticipantRow],
+      [{ giver_id: 'a', giftee_id: 'b' }],
+    )
+    expect(out.exclusions).toEqual([{ giverId: 'a', gifteeId: 'b' }])
+    expect(JSON.stringify(out)).not.toContain('secret')
+    expect(JSON.stringify(out)).not.toContain('cozy')
+  })
+})

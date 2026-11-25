@@ -95,6 +95,8 @@
     "lockedNote": "The draw is done, so participants can no longer be edited."
   },
   "errors": {
+    "exclusion_self": "Pick two different people.",
+    "exclusion_duplicate": "This rule already exists.",
     "theme_label_required": "Type a theme name.",
     "theme_label_too_long": "That theme name is too long.",
     "theme_duplicate": "That theme already exists.",
@@ -164,8 +166,22 @@
       "too_few_participants": "Add at least {{min}} participants to start (you have {{count}}).",
       "missing_gender": "Same-gender matching needs a gender for everyone. Missing for: {{names}}.",
       "group_too_small": "The \"{{group}}\" group has only one person, so they can't be matched within it. Add someone to that group or switch to mixed matching.",
-      "too_few_themes": "Select at least {{needed}} themes (you have {{selected}})."
+      "too_few_themes": "Select at least {{needed}} themes (you have {{selected}}).",
+      "no_allowed_giftee": "{{name}} can't buy for anyone: they are excluded from everyone else. Remove a rule.",
+      "no_allowed_giver": "Nobody can buy for {{name}}: everyone else is excluded from them. Remove a rule.",
+      "no_valid_cycle": "These exclusions leave no way to match everyone in one circle. Remove a rule."
     }
+  },
+  "exclusions": {
+    "title": "Exclusions",
+    "hint": "Optional. \"A can't buy for B\" only blocks A giving to B. B giving to A stays allowed unless you add that rule too.",
+    "privacy": "These rules are your input, not results. They never reveal who got whom.",
+    "giver": "Who",
+    "giftee": "can't buy for",
+    "cantBuyFor": "can't buy for",
+    "add": "Add rule",
+    "rule": "{{giver}} can't buy for {{giftee}}",
+    "remove": "Remove rule: {{giver}} can't buy for {{giftee}}"
   },
   "reveal": {
     "greeting": "Hi {{name}}!",

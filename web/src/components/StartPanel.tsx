@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CUSTOM_THEME_LIMITS, THEMES, themeLabel } from '../../../supabase/functions/_shared/themes.ts'
+import ExclusionsPanel from './ExclusionsPanel'
 import { api, type ManageData } from '../lib/api'
 import { apiErrorMessage } from '../lib/errors'
 import { issueMessage, startIssues } from '../lib/preflight'
@@ -66,7 +67,7 @@ export default function StartPanel({ token, data, onChange }: Props) {
   const toggleTheme = (id: string) =>
     updateThemes(themeIds.includes(id) ? themeIds.filter((x) => x !== id) : [...themeIds, id])
 
-  const issues = startIssues(participants, themeIds.length, sameGender)
+  const issues = startIssues(participants, themeIds.length, sameGender, data.exclusions)
   const blocked = issues.length > 0
 
   async function start() {
@@ -183,6 +184,8 @@ export default function StartPanel({ token, data, onChange }: Props) {
         </form>
         <p className="text-xs text-neutral-500">{t('themes.customHint', { max: CUSTOM_THEME_LIMITS.maxCount })}</p>
       </section>
+
+      <ExclusionsPanel token={token} data={data} onChange={onChange} />
 
       <div className="space-y-3">
         {blocked && (

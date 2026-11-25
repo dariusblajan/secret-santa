@@ -51,8 +51,14 @@ export interface ManageParticipant {
   openedAt: string | null
 }
 
+export interface ManageExclusion {
+  giverId: string
+  gifteeId: string
+}
+
 export interface ManageData {
   party: ManageParty
+  exclusions: ManageExclusion[]
   participants: ManageParticipant[]
 }
 
@@ -117,6 +123,10 @@ export const api = {
   setThemes: (token: string, themeIds: string[]) => manage(token, 'set-themes', { themeIds }),
   addTheme: (token: string, label: string) => manage(token, 'add-theme', { label }),
   removeTheme: (token: string, themeId: string) => manage(token, 'remove-theme', { themeId }),
+  addExclusion: (token: string, giverId: string, gifteeId: string) =>
+    manage(token, 'add-exclusion', { giverId, gifteeId }),
+  removeExclusion: (token: string, giverId: string, gifteeId: string) =>
+    manage(token, 'remove-exclusion', { giverId, gifteeId }),
   startParty: (token: string, sameGender: boolean) => manage(token, 'start', { sameGender }),
   redoDraw: (token: string, sameGender: boolean) => manage(token, 'redo', { sameGender }),
   resendInvite: (token: string, participantId: string) => manage(token, 'resend', { participantId }),

@@ -96,6 +96,8 @@
     "lockedNote": "Extragerea s-a făcut, așa că participanții nu mai pot fi modificați."
   },
   "errors": {
+    "exclusion_self": "Alege două persoane diferite.",
+    "exclusion_duplicate": "Această regulă există deja.",
     "theme_label_required": "Scrie numele temei.",
     "theme_label_too_long": "Numele temei este prea lung.",
     "theme_duplicate": "Această temă există deja.",
@@ -165,8 +167,22 @@
       "too_few_participants": "Adaugă cel puțin {{min}} participanți ca să pornești (ai {{count}}).",
       "missing_gender": "Potrivirea pe același gen cere genul fiecărui participant. Lipsește pentru: {{names}}.",
       "group_too_small": "Grupul „{{group}}” are o singură persoană, deci nu poate fi potrivită în interiorul lui. Adaugă pe cineva în acest grup sau treci la potrivire mixtă.",
-      "too_few_themes": "Selectează cel puțin {{needed}} teme (ai {{selected}})."
+      "too_few_themes": "Selectează cel puțin {{needed}} teme (ai {{selected}}).",
+      "no_allowed_giftee": "{{name}} nu poate cumpăra pentru nimeni: este exclus/ă de la toți ceilalți. Șterge o regulă.",
+      "no_allowed_giver": "Nimeni nu poate cumpăra pentru {{name}}: toți ceilalți sunt excluși de la această persoană. Șterge o regulă.",
+      "no_valid_cycle": "Aceste excluderi nu permit potrivirea tuturor într-un singur cerc. Șterge o regulă."
     }
+  },
+  "exclusions": {
+    "title": "Excluderi",
+    "hint": "Opțional. „A nu poate cumpăra pentru B” blochează doar A→B. B→A rămâne permis dacă nu adaugi și acea regulă.",
+    "privacy": "Aceste reguli sunt datele tale, nu rezultate. Nu arată cine a primit pe cine.",
+    "giver": "Cine",
+    "giftee": "nu poate cumpăra pentru",
+    "cantBuyFor": "nu poate cumpăra pentru",
+    "add": "Adaugă regulă",
+    "rule": "{{giver}} nu poate cumpăra pentru {{giftee}}",
+    "remove": "Șterge regula: {{giver}} nu poate cumpăra pentru {{giftee}}"
   },
   "reveal": {
     "greeting": "Salut, {{name}}!",

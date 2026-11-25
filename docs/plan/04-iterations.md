@@ -138,8 +138,8 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 - All copy in ro and en
 
 **Behaviour**
-- Stored as `(party_id, giver_id, giftee_id)` pairs; a participant can't exclude themselves, and duplicates are rejected.
-- The draw stays a single cycle. Feasibility means a Hamiltonian cycle exists in the allowed graph (mode rules minus exclusions). With at most 15 participants a backtracking search is enough, and the same check backs the pre-flight warning.
+- Stored in `party_exclusions` as `(party_id, giver_id, giftee_id)` pairs; editing the party in draft keeps rules by participant email (a removed or re-emailed participant loses theirs); a participant can't exclude themselves, and duplicates are rejected.
+- The draw stays a single cycle. Feasibility means a Hamiltonian cycle exists in the allowed graph (mode rules minus exclusions). With at most 15 participants a bitmask DP over Hamiltonian cycles is exact and instant; the same table backs the pre-flight warning and a uniformly random cycle pick.
 - The draw picks a random valid cycle (not the first one found), so exclusions don't bias the result.
 - Exclusions are validated server-side: only while the party is `draft` or `drawn`, and only for participants of that party.
 - The `manage-party` endpoint may return exclusions (organizer input) but still never returns match or theme fields.

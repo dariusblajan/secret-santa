@@ -29,7 +29,12 @@ export interface ParticipantRow {
   [key: string]: unknown
 }
 
-export function serializeManage(party: PartyRow, participants: ParticipantRow[]) {
+export interface ExclusionRow {
+  giver_id: string
+  giftee_id: string
+}
+
+export function serializeManage(party: PartyRow, participants: ParticipantRow[], exclusions: ExclusionRow[] = []) {
   return {
     party: {
       id: party.id,
@@ -44,6 +49,8 @@ export function serializeManage(party: PartyRow, participants: ParticipantRow[])
       themeIds: party.theme_ids,
       customThemes: parseCustomThemes(party.custom_themes),
     },
+    // Organizer input, not a result: safe to return.
+    exclusions: exclusions.map((x) => ({ giverId: x.giver_id, gifteeId: x.giftee_id })),
     participants: participants.map((p) => ({
       id: p.id,
       name: p.name,
