@@ -52,26 +52,92 @@ export default function PartyForm({ mode, initial, submitting, serverErrors, for
   const [accessCodeMissing, setAccessCodeMissing] = useState(false)
   const [importing, setImporting] = useState(false)
 
-  const errors = [...clientErrors, ...(serverErrors ?? [])]
+  // Server errors come from props, so "cleared" ones are remembered here and reset when a new response arrives.
+  const [dismissed, setDismissed] = useState<{ source: ValidationError[] | undefined; fields: string[] }>({
+    source: serverErrors,
+    fields: [],
+  })
+  const dismissedFields = dismissed.source === serverErrors ? dismissed.fields : []
+
+  const errors = [
+    ...clientErrors,
+    ...(serverErrors ?? []).filter((e) => !dismissedFields.includes(e.field)),
+  ]
   const errorFor = (field: string): string | undefined => {
     const found = errors.find((e) => e.field === field)
     return found ? errorMessage(t, found.code) : undefined
   }
 
-  const set = <K extends keyof PartyFormValues>(key: K, value: PartyFormValues[K]) =>
-    setValues((v) => ({ ...v, [key]: value }))
+  /**
+   * After the values changed, refresh the errors of the affected fields: a field that was showing an error
+   * is re-checked against the new values (so it disappears once valid and stays if still invalid),
+   * and a field that wasn't showing one is left alone until submit.
+   */
+  function refreshErrors(
+    next: PartyFormValues,
+    affected: (field: string) => boolean,
+    remap: (field: string) => string = (f) => f,
+  ) {
+    const shown = new Set(errors.filter((e) => affected(e.field)).map((e) => remap(e.field)))
+    if (shown.size === 0) return
+    const fresh = validateParty(toPartyInput(next)).filter((e) => shown.has(e.field))
+    setClientErrors((prev) => [...prev.filter((e) => !affected(e.field)), ...fresh])
+    setDismissed({ source: serverErrors, fields: [...new Set([...dismissedFields, ...shown])] })
+  }
 
-  const setParticipant = (index: number, patch: Partial<PartyFormValues['participants'][number]>) =>
-    setValues((v) => ({
-      ...v,
-      participants: v.participants.map((p, i) => (i === index ? { ...p, ...patch } : p)),
-    }))
+  const FIELD_ERROR_KEY: Partial<Record<keyof PartyFormValues, string>> = { budget: 'budgetAmount' }
+
+  const set = <K extends keyof PartyFormValues>(key: K, value: PartyFormValues[K]) => {
+    const next = { ...values, [key]: value }
+    setValues(next)
+    const field = FIELD_ERROR_KEY[key] ?? key
+    refreshErrors(next, (f) => f === field)
+  }
+
+  const setParticipant = (index: number, patch: Partial<PartyFormValues['participants'][number]>) => {
+    const next = {
+      ...values,
+      participants: values.participants.map((p, i) => (i === index ? { ...p, ...patch } : p)),
+    }
+    setValues(next)
+    // An email change can also resolve (or cause) a duplicate-email error on another row.
+    const emailChanged = 'email' in patch
+    refreshErrors(next, (f) =>
+      emailChanged ? /^participants\.\d+\.email$/.test(f) : (['name', 'email'] as const).some((k) => k in patch && f === `participants.${index}.${k}`),
+    )
+  }
 
   const addParticipant = () =>
     setValues((v) => ({ ...v, participants: [...v.participants, { name: '', email: '', gender: '' }] }))
 
-  const removeParticipant = (index: number) =>
-    setValues((v) => ({ ...v, participants: v.participants.filter((_, i) => i !== index) }))
+  const removeParticipant = (index: number) => {
+    const next = { ...values, participants: values.participants.filter((_, i) => i !== index) }
+    setValues(next)
+    // Row numbers shift, so re-check every participant field that was showing an error.
+    refreshErrors(next, (f) => f.startsWith('participants.'))
+  }
+
+  // The organizer is always the first entry, so "make organizer" swaps that person with the current first one.
+  const isBlank = (p: PartyFormValues['participants'][number]) => p.name.trim() === '' && p.email.trim() === ''
+
+  const makeOrganizer = (index: number) => {
+    const people = values.participants
+    // A blank organizer slot (e.g. after importing before filling in your own details) is dropped, not swapped
+    // down into the list. Otherwise the two entries trade places.
+    const dropFirst = isBlank(people[0])
+    const reordered = dropFirst
+      ? [people[index], ...people.filter((_, i) => i !== 0 && i !== index)]
+      : people.map((p, i) => (i === 0 ? people[index] : i === index ? people[0] : p))
+    const next = { ...values, participants: reordered }
+    setValues(next)
+
+    // Error markers follow their rows to the new positions; the dropped row's markers disappear with it.
+    const newIndex = (k: number) =>
+      dropFirst ? (k === 0 ? -1 : k === index ? 0 : k < index ? k : k - 1) : k === 0 ? index : k === index ? 0 : k
+    const follow = (f: string) =>
+      f.replace(/^participants\.(\d+)\./, (_m, n) => `participants.${newIndex(Number(n))}.`)
+    refreshErrors(next, (f) => f.startsWith('participants.'), follow)
+  }
 
   // Imported rows are appended after the existing entries (the organizer stays first). Nothing is saved yet;
   // participant-level errors are shown right away so problem rows can be fixed in place.
@@ -83,6 +149,10 @@ export default function PartyForm({ mode, initial, submitting, serverErrors, for
     }
     setValues(next)
     setClientErrors(validateParty(toPartyInput(next)).filter((e) => e.field.startsWith('participants.')))
+    setDismissed({
+      source: serverErrors,
+      fields: [...new Set([...dismissedFields, ...(serverErrors ?? []).map((e) => e.field)])],
+    })
     setImporting(false)
   }
 
@@ -234,14 +304,24 @@ export default function PartyForm({ mode, initial, submitting, serverErrors, for
                     {i === 0 ? t('participants.you') : `#${i + 1}`}
                   </span>
                   {i > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => removeParticipant(i)}
-                      className="text-sm text-red-700 underline"
-                      aria-label={`${t('participants.remove')} #${i + 1}`}
-                    >
-                      {t('participants.remove')}
-                    </button>
+                    <div className="flex gap-4">
+                      <button
+                        type="button"
+                        onClick={() => makeOrganizer(i)}
+                        className="text-sm underline"
+                        aria-label={`${t('participants.makeOrganizer')} #${i + 1}`}
+                      >
+                        {t('participants.makeOrganizer')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeParticipant(i)}
+                        className="text-sm text-red-700 underline"
+                        aria-label={`${t('participants.remove')} #${i + 1}`}
+                      >
+                        {t('participants.remove')}
+                      </button>
+                    </div>
                   )}
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">

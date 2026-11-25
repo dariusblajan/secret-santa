@@ -64,6 +64,7 @@
     "boy": "Boy",
     "add": "Add participant",
     "remove": "Remove participant",
+    "makeOrganizer": "Make organizer",
     "minHint": "You need at least {{min}} participants (including you) to start the draw."
   },
   "manage": {

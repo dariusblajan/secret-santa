@@ -31,7 +31,7 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 **Flow**
 1. Home → enter access code → "Create party".
 2. Fill party form: name, date, time (Romanian time), location name, optional budget (currency shown from party language: RON/USD), party language (default English).
-3. Add participants: name, email, optional gender. The organizer's own entry is first and marked "you".
+3. Add participants: name, email, optional gender. The organizer's own entry is first and marked "you". Any other entry has a **Make organizer** action that swaps it into the first slot (the previous organizer takes its old place; if the first slot is still blank, e.g. after importing before filling in your own details, it is removed instead of being moved down), so the organizer fields and the first position always belong to the organizer. This also works while editing a draft party.
 4. Review summary → save (still `draft`, nothing emailed).
 5. Organizer receives the `admin_link` email and lands on the manage page.
 6. Reopen later via the emailed link (and remembered link in the browser).
@@ -170,7 +170,7 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 **Flow**
 1. In the participants editor → **Import from file** → pick a file (or drag and drop).
 2. **Preview** dialog: how many rows were read, how many look valid, and a table with row numbers and per-row problems (invalid email, duplicate email within the file or against the editor, bad gender value, missing name).
-3. **Add to list** appends the rows after the existing entries. The organizer's own entry stays first. Nothing is saved yet; the organizer reviews in the editor and uses the normal save.
+3. **Add to list** appends the rows after the existing entries. The organizer's own entry stays first (use **Make organizer** afterwards if the organizer is in the file, so they can be moved to the top). Nothing is saved yet; the organizer reviews in the editor and uses the normal save.
 4. Problem rows are added too, with the **inline error markers** the editor already has, so the organizer fixes them in place instead of editing the file and re-importing.
 5. Rows that would exceed the 15-participant cap are not added; the dialog says how many were left out.
 
@@ -189,7 +189,7 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 
 **Done when**
 - Parser tests pass: header variants, `B`/`G`/`b`/`g`/empty, unknown gender, `;` and `,` CSV, BOM, empty rows, duplicate emails (in file and against existing), more than 15 rows, wrong columns.
-- Imported rows keep the organizer first and respect the cap; nothing persists until save.
+- Imported rows keep the organizer first and respect the cap; nothing persists until save. **Make organizer** on any imported row swaps it into the organizer slot.
 - Server-side validation still rejects bad data if the browser is bypassed.
 
 ---

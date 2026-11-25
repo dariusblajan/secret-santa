@@ -64,6 +64,7 @@
     "boy": "Băiat",
     "add": "Adaugă participant",
     "remove": "Șterge participantul",
+    "makeOrganizer": "Fă-l organizator",
     "minHint": "Ai nevoie de cel puțin {{min}} participanți (inclusiv tu) ca să pornești extragerea."
   },
   "manage": {
