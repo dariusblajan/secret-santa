@@ -114,7 +114,41 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 
 ---
 
-## Iteration 5: Reminders
+## Iteration 5: Matching exclusions
+
+**Scope**
+- Optional, directional exclusions: "**A can't buy for B**". They only block A→B; B→A stays allowed unless it is added as its own rule. No exclusions is the default and behaves exactly as before.
+- Exclusions apply **on top of** the matching mode (mixed / same-gender): both constrain the draw.
+
+**Flow**
+1. Manage page → **Exclusions** panel (optional, collapsed when empty). Add a rule by picking a giver and a person they can't buy for; remove a rule with one tap. Rules are listed as "A can't buy for B".
+2. The panel is editable at any time before the party starts. It stays editable after the start so the organizer can adjust it before a **Redo draw**; participants themselves stay locked.
+3. Pre-flight checks gain a new **amber warning** reason (same pattern as iteration 2, above the Start / Redo button, which is disabled): the exclusions leave no valid single cycle for the current participants and matching mode. The message names the most restrictive cause when it can (e.g. "Ana can't buy for anyone: she is excluded from everyone else").
+4. **Start party** and **Redo draw** (iteration 3) only produce matches that respect every exclusion.
+5. Removing a participant also removes the rules that mention them.
+
+**UI**
+- Exclusions panel (giver and giftee pickers, rule list with remove)
+- Amber warning for infeasible exclusions
+- Inline note that exclusions never reveal matches (they are organizer input, not results)
+- All copy in ro and en
+
+**Behaviour**
+- Stored as `(party_id, giver_id, giftee_id)` pairs; a participant can't exclude themselves, and duplicates are rejected.
+- The draw stays a single cycle. Feasibility means a Hamiltonian cycle exists in the allowed graph (mode rules minus exclusions). With at most 15 participants a backtracking search is enough, and the same check backs the pre-flight warning.
+- The draw picks a random valid cycle (not the first one found), so exclusions don't bias the result.
+- Exclusions are validated server-side: only while the party is `draft` or `drawn`, and only for participants of that party.
+- The `manage-party` endpoint may return exclusions (organizer input) but still never returns match or theme fields.
+
+**Done when**
+- Draw tests pass with exclusions: no excluded pair ever appears for n = 3..15, 10 000 random runs, combined with same-gender mode.
+- Infeasible sets are detected (e.g. someone excluded from everyone else; a set that leaves no single cycle) and block Start and Redo with the amber warning; a feasible set never produces a false block.
+- Redo respects exclusions edited after the start; a participant removal drops their rules.
+- Draws with no exclusions behave exactly as in iterations 2 and 3.
+
+---
+
+## Iteration 6: Reminders
 
 **Flow**
 1. Manage page → Reminders: pick a preset (countdown, budget, your match, last call, theme nudge) or write a custom message.
@@ -135,7 +169,7 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 
 ---
 
-## Iteration 6: Hardening and polish
+## Iteration 7: Hardening and polish
 
 **Scope**
 - Rate limiting, participant/party caps, input sanitising in emails (HTML escaping).
