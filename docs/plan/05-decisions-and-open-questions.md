@@ -45,7 +45,7 @@
 | D37 | Exclusions are editable any time before start and before a redo; the redo honours them | Confirmed |
 | D38 | Infeasible exclusions show the amber pre-flight warning and disable Start/Redo; feasibility is checked with the same search the draw uses | Confirmed |
 | D39 | With exclusions the draw is a random Hamiltonian cycle found by backtracking (n ≤ 15); no exclusions keeps plain Sattolo | Single cycle preserved, behaviour unchanged for parties without exclusions |
-| D40 | Participants import (`.csv`/`.xlsx`/`.xls`, columns name, email, gender B/G) is Iteration 6 and runs in the browser | Confirmed; no new backend, file never uploaded |
+| D40 | Participants import (`.csv` only, columns name, email, gender B/G) is Iteration 6 and runs in the browser | Confirmed; no new backend, file never uploaded. Excel files dropped (no safe SheetJS on npm) |
 | D41 | Import appends after a preview; bad rows land in the editor with inline error markers; rows over the 15 cap are left out | Confirmed |
 
 ## 5.2 Open questions

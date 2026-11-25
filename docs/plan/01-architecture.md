@@ -27,7 +27,7 @@ Pages quirks to handle:
 | Routing | React Router (`HashRouter`) | |
 | Data fetching | TanStack Query | |
 | Forms | React Hook Form + Zod | Same Zod schemas can validate on the server |
-| File import | xlsx/csv parser (e.g. SheetJS), lazy-loaded in `web/` | Participants import runs in the browser only, see doc 2.6 |
+| File import | Small hand-written CSV parser in `web/src/lib/` (no library) | Participants import runs in the browser only, see doc 2.6 |
 | i18n | react-i18next | en + ro, see doc 3 |
 | Backend | Supabase | Postgres + Edge Functions (Deno/TS) + `pg_cron` |
 | Email | Brevo (free tier, 300/day) | Single-sender verification, no domain needed |

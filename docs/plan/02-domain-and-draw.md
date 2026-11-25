@@ -134,7 +134,7 @@ Test cases: n = 3..30, same-gender with uneven groups, group of 1 (error), group
 
 ## 2.6 Participants file import
 
-- Input: `.csv`, `.xlsx` or `.xls` with a header row and columns `name`, `email`, `gender`. `gender` is optional: `B` → `boy`, `G` → `girl`, case-insensitive, empty → null.
+- Input: `.csv` with a header row and columns `name`, `email`, `gender`. `gender` is optional: `B` → `boy`, `G` → `girl`, case-insensitive, empty → null.
 - Parsed entirely in the browser by a pure `parseParticipantsFile` function in `web/src/lib/`. It returns normalised rows plus per-row problems (missing name, invalid email, duplicate email in the file or against the editor, bad gender value). The backend has no import endpoint.
 - Rows are appended to the editor state after a preview, organizer first, capped at 15 total; problem rows are added with inline error markers. Nothing is stored until the normal save, which validates again on the server.
 - Cell contents are treated as text only (no formula evaluation).
