@@ -95,6 +95,11 @@
     "lockedNote": "The draw is done, so participants can no longer be edited."
   },
   "errors": {
+    "theme_label_required": "Type a theme name.",
+    "theme_label_too_long": "That theme name is too long.",
+    "theme_duplicate": "That theme already exists.",
+    "too_many_themes": "You reached the limit of custom themes.",
+    "theme_in_use": "This theme is dealt to someone. You can remove it after the next redo.",
     "required": "This field is required.",
     "too_long": "This is too long.",
     "invalid_email": "Enter a valid email address.",
@@ -135,7 +140,13 @@
     "hint": "Each participant gets one unique theme as a hint for their gift.",
     "counter": "{{selected}} selected, need at least {{needed}}",
     "selectAll": "Select all",
-    "selectNone": "Select none"
+    "selectNone": "Select none",
+    "search": "Search themes",
+    "customLabel": "Custom theme",
+    "customPlaceholder": "Add your own theme",
+    "customHint": "Up to {{max}} custom themes. They look the same in every language.",
+    "add": "Add",
+    "remove": "Remove {{name}}"
   },
   "start": {
     "button": "Start party",

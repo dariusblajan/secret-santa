@@ -1,6 +1,8 @@
 // Pure TypeScript. Builds the organizer-facing response with an explicit WHITELIST of fields,
 // so match data (giftee, theme) can never leak to the organizer even if a row contains it.
 
+import { parseCustomThemes } from './themes.ts'
+
 export interface PartyRow {
   id: string
   name: string
@@ -12,6 +14,7 @@ export interface PartyRow {
   draw_version: number
   same_gender_mode: boolean
   theme_ids: string[]
+  custom_themes?: unknown
   [key: string]: unknown
 }
 
@@ -39,6 +42,7 @@ export function serializeManage(party: PartyRow, participants: ParticipantRow[])
       drawVersion: party.draw_version,
       sameGender: party.same_gender_mode,
       themeIds: party.theme_ids,
+      customThemes: parseCustomThemes(party.custom_themes),
     },
     participants: participants.map((p) => ({
       id: p.id,

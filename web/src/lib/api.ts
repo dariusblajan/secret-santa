@@ -1,4 +1,5 @@
 import type { DrawIssue } from '../../../supabase/functions/_shared/draw.ts'
+import type { CustomTheme } from '../../../supabase/functions/_shared/themes.ts'
 import type { PartyInput, ValidationError } from '../../../supabase/functions/_shared/validation.ts'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined
@@ -37,6 +38,7 @@ export interface ManageParty {
   drawVersion: number
   sameGender: boolean
   themeIds: string[]
+  customThemes: CustomTheme[]
 }
 
 export interface ManageParticipant {
@@ -65,6 +67,7 @@ export interface RevealData {
   you: string
   giftee: string
   themeId: string | null
+  themeLabel: string | null
   participantNames: string[]
   drawVersion: number
   remade: boolean
@@ -112,6 +115,8 @@ export const api = {
   getParty: (token: string) => manage(token, 'get'),
   updateParty: (token: string, party: PartyInput) => manage(token, 'update', { party }),
   setThemes: (token: string, themeIds: string[]) => manage(token, 'set-themes', { themeIds }),
+  addTheme: (token: string, label: string) => manage(token, 'add-theme', { label }),
+  removeTheme: (token: string, themeId: string) => manage(token, 'remove-theme', { themeId }),
   startParty: (token: string, sameGender: boolean) => manage(token, 'start', { sameGender }),
   redoDraw: (token: string, sameGender: boolean) => manage(token, 'redo', { sameGender }),
   resendInvite: (token: string, participantId: string) => manage(token, 'resend', { participantId }),

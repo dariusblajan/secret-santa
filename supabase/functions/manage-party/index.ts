@@ -5,7 +5,14 @@ import { checkDrawable, checkThemes, drawAssignments, type DrawIssue } from '../
 import { inviteEmail } from '../_shared/emails/invite.ts'
 import { redoEmail } from '../_shared/emails/redo.ts'
 import { serializeManage, type ParticipantRow, type PartyRow } from '../_shared/serialize.ts'
-import { dealThemes, sanitizeThemeIds } from '../_shared/themes.ts'
+import {
+  dealThemes,
+  newCustomThemeId,
+  normalizeThemeLabel,
+  parseCustomThemes,
+  sanitizeThemeIds,
+  validateCustomTheme,
+} from '../_shared/themes.ts'
 import { bucharestToDate } from '../_shared/time.ts'
 import { generateToken, sha256Hex } from '../_shared/tokens.ts'
 import { normalizeParty, validateParty } from '../_shared/validation.ts'
@@ -14,7 +21,7 @@ type Db = ReturnType<typeof adminClient>
 
 // NOTE: giftee_id and theme are deliberately never selected here. The organizer must not see matches.
 const PARTY_COLUMNS =
-  'id, name, event_at, location_name, budget_amount, locale, status, draw_version, same_gender_mode, theme_ids'
+  'id, name, event_at, location_name, budget_amount, locale, status, draw_version, same_gender_mode, theme_ids, custom_themes'
 const PARTICIPANT_COLUMNS = 'id, name, email, gender, is_organizer, invited_at, revealed_at'
 
 function revealUrl(token: string): string {
@@ -138,7 +145,54 @@ Deno.serve(async (req) => {
       // The theme pool stays editable after the start so the organizer can adjust it before a redo.
       const { error } = await db
         .from('parties')
-        .update({ theme_ids: sanitizeThemeIds(body.themeIds) })
+        .update({ theme_ids: sanitizeThemeIds(body.themeIds, parseCustomThemes(rows.party.custom_themes)) })
+        .eq('id', rows.party.id)
+      if (error) throw error
+      const data = await load(db, adminHash)
+      return data ? json(req, data) : notFound(req)
+    }
+
+    // ---- add a custom theme (it joins the pool, selected) --------------------
+    if (body.action === 'add-theme') {
+      const rows = await loadRows(db, adminHash)
+      if (!rows) return notFound(req)
+      const custom = parseCustomThemes(rows.party.custom_themes)
+      const label = normalizeThemeLabel(body.label)
+      const problem = validateCustomTheme(label, custom)
+      if (problem) return json(req, { code: problem, message: 'Invalid theme' }, 422)
+
+      const added = { id: newCustomThemeId(), label }
+      const { error } = await db
+        .from('parties')
+        .update({ custom_themes: [...custom, added], theme_ids: [...rows.party.theme_ids, added.id] })
+        .eq('id', rows.party.id)
+      if (error) throw error
+      const data = await load(db, adminHash)
+      return data ? json(req, data) : notFound(req)
+    }
+
+    // ---- remove a custom theme ---------------------------------------------
+    if (body.action === 'remove-theme') {
+      const rows = await loadRows(db, adminHash)
+      if (!rows) return notFound(req)
+      const custom = parseCustomThemes(rows.party.custom_themes)
+      if (!custom.some((c) => c.id === body.themeId)) return notFound(req)
+
+      // After the draw a dealt theme must stay readable on the reveal page until the next redo.
+      const { count, error: usedError } = await db
+        .from('participants')
+        .select('id', { count: 'exact', head: true })
+        .eq('party_id', rows.party.id)
+        .eq('theme', body.themeId as string)
+      if (usedError) throw usedError
+      if (count) return json(req, { code: 'theme_in_use', message: 'Theme is dealt to someone' }, 409)
+
+      const { error } = await db
+        .from('parties')
+        .update({
+          custom_themes: custom.filter((c) => c.id !== body.themeId),
+          theme_ids: rows.party.theme_ids.filter((id) => id !== body.themeId),
+        })
         .eq('id', rows.party.id)
       if (error) throw error
       const data = await load(db, adminHash)
@@ -154,13 +208,14 @@ Deno.serve(async (req) => {
 
       const sameGender = body.sameGender === true
       const people = participants.map((p) => ({ id: p.id, name: p.name, gender: p.gender }))
-      const pool = sanitizeThemeIds(party.theme_ids)
+      const custom = parseCustomThemes(party.custom_themes)
+      const pool = sanitizeThemeIds(party.theme_ids, custom)
       const issues: DrawIssue[] = [...checkDrawable(people, sameGender), ...checkThemes(pool.length, people.length)]
       if (issues.length > 0) return json(req, { code: 'cannot_start', message: 'Cannot start', issues }, 422)
 
       // Decide matches and themes. They exist only in memory and in the database.
       const giftees = drawAssignments(people, sameGender)
-      const themes = dealThemes(pool, people.map((p) => p.id))
+      const themes = dealThemes(pool, people.map((p) => p.id), custom)
 
       // Raw reveal tokens exist only until the emails are sent; the database keeps hashes.
       const tokens: Record<string, string> = {}
@@ -205,12 +260,13 @@ Deno.serve(async (req) => {
 
       const sameGender = body.sameGender === true
       const people = participants.map((p) => ({ id: p.id, name: p.name, gender: p.gender }))
-      const pool = sanitizeThemeIds(party.theme_ids)
+      const custom = parseCustomThemes(party.custom_themes)
+      const pool = sanitizeThemeIds(party.theme_ids, custom)
       const issues: DrawIssue[] = [...checkDrawable(people, sameGender), ...checkThemes(pool.length, people.length)]
       if (issues.length > 0) return json(req, { code: 'cannot_start', message: 'Cannot redo', issues }, 422)
 
       const giftees = drawAssignments(people, sameGender)
-      const themes = dealThemes(pool, people.map((p) => p.id))
+      const themes = dealThemes(pool, people.map((p) => p.id), custom)
       const assignments = people.map((p) => ({ id: p.id, giftee_id: giftees[p.id], theme: themes[p.id] }))
 
       const { error } = await db.rpc('redo_draw_tx', {

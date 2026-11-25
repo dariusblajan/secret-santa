@@ -96,6 +96,11 @@
     "lockedNote": "Extragerea s-a făcut, așa că participanții nu mai pot fi modificați."
   },
   "errors": {
+    "theme_label_required": "Scrie numele temei.",
+    "theme_label_too_long": "Numele temei este prea lung.",
+    "theme_duplicate": "Această temă există deja.",
+    "too_many_themes": "Ai atins limita de teme proprii.",
+    "theme_in_use": "Tema este atribuită cuiva. O poți șterge după următoarea refacere a extragerii.",
     "required": "Acest câmp este obligatoriu.",
     "too_long": "Textul este prea lung.",
     "invalid_email": "Introdu o adresă de email validă.",
@@ -136,7 +141,13 @@
     "hint": "Fiecare participant primește o temă unică, drept indiciu pentru cadou.",
     "counter": "{{selected}} selectate, ai nevoie de cel puțin {{needed}}",
     "selectAll": "Selectează tot",
-    "selectNone": "Deselectează tot"
+    "selectNone": "Deselectează tot",
+    "search": "Caută teme",
+    "customLabel": "Temă proprie",
+    "customPlaceholder": "Adaugă o temă proprie",
+    "customHint": "Cel mult {{max}} teme proprii. Arată la fel în toate limbile.",
+    "add": "Adaugă",
+    "remove": "Șterge {{name}}"
   },
   "start": {
     "button": "Pornește petrecerea",

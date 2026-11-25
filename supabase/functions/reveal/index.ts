@@ -1,5 +1,6 @@
 import { json, preflight } from '../_shared/cors.ts'
 import { adminClient } from '../_shared/db.ts'
+import { parseCustomThemes } from '../_shared/themes.ts'
 import { sha256Hex } from '../_shared/tokens.ts'
 
 const notFound = (req: Request) => json(req, { code: 'not_found', message: 'Not found' }, 404)
@@ -36,7 +37,7 @@ Deno.serve(async (req) => {
     const [{ data: party }, { data: giftee }, { data: everyone }] = await Promise.all([
       db
         .from('parties')
-        .select('name, event_at, location_name, budget_amount, locale, status, draw_version')
+        .select('name, event_at, location_name, budget_amount, locale, status, draw_version, custom_themes')
         .eq('id', me.party_id)
         .single(),
       db.from('participants').select('name').eq('id', me.giftee_id).single(),
@@ -60,6 +61,7 @@ Deno.serve(async (req) => {
       you: me.name,
       giftee: giftee.name,
       themeId: me.theme,
+      themeLabel: parseCustomThemes(party.custom_themes).find((c) => c.id === me.theme)?.label ?? null,
       participantNames: (everyone ?? []).map((p) => p.name),
       drawVersion: party.draw_version,
       remade: party.draw_version > 1,

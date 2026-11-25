@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { THEMES, themeLabel } from '../../../supabase/functions/_shared/themes.ts'
+import { CUSTOM_THEME_LIMITS, THEMES, themeLabel } from '../../../supabase/functions/_shared/themes.ts'
 import { api, type ManageData } from '../lib/api'
 import { apiErrorMessage } from '../lib/errors'
 import { issueMessage, startIssues } from '../lib/preflight'
@@ -20,6 +20,9 @@ export default function StartPanel({ token, data, onChange }: Props) {
 
   const [sameGender, setSameGender] = useState(data.party.sameGender)
   const [themeIds, setThemeIds] = useState<string[]>(data.party.themeIds)
+  const [customThemes, setCustomThemes] = useState(data.party.customThemes)
+  const [newLabel, setNewLabel] = useState('')
+  const [search, setSearch] = useState('')
   const [confirming, setConfirming] = useState(false)
   const [starting, setStarting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -38,6 +41,26 @@ export default function StartPanel({ token, data, onChange }: Props) {
     saveChain.current = saveChain.current
       .then(() => api.setThemes(token, next))
       .catch((err) => setError(apiErrorMessage(t, err)))
+  }
+
+  // Custom themes change the pool too, so they wait for pending toggles and then take the server's answer.
+  function customAction(run: () => Promise<ManageData>, after?: () => void) {
+    setError(null)
+    saveChain.current = saveChain.current
+      .then(run)
+      .then((next) => {
+        setCustomThemes(next.party.customThemes)
+        setThemeIds(next.party.themeIds)
+        onChange(next)
+        after?.()
+      })
+      .catch((err) => setError(apiErrorMessage(t, err)))
+  }
+
+  function addCustom(e: FormEvent) {
+    e.preventDefault()
+    const label = newLabel.trim()
+    if (label) customAction(() => api.addTheme(token, label), () => setNewLabel(''))
   }
 
   const toggleTheme = (id: string) =>
@@ -100,11 +123,21 @@ export default function StartPanel({ token, data, onChange }: Props) {
         <p className="text-sm" role="status">
           {t('themes.counter', { selected: themeIds.length, needed: participants.length })}
         </p>
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          aria-label={t('themes.search')}
+          placeholder={t('themes.search')}
+          className="w-full rounded border border-neutral-300 px-3 py-1 text-sm"
+        />
         <ul className="flex flex-wrap gap-2">
-          {THEMES.map((theme) => {
+          {[...THEMES.map((x) => ({ id: x.id, custom: false })), ...customThemes.map((x) => ({ id: x.id, custom: true }))]
+            .filter((x) => themeLabel(x.id, uiLocale, customThemes).toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()))
+            .map((theme) => {
             const on = themeIds.includes(theme.id)
             return (
-              <li key={theme.id}>
+              <li key={theme.id} className="flex">
                 <button
                   type="button"
                   aria-pressed={on}
@@ -115,12 +148,40 @@ export default function StartPanel({ token, data, onChange }: Props) {
                       : 'border-neutral-300 text-neutral-600 hover:border-neutral-500'
                   }`}
                 >
-                  {themeLabel(theme.id, uiLocale)}
+                  {themeLabel(theme.id, uiLocale, customThemes)}
                 </button>
+                {theme.custom && (
+                  <button
+                    type="button"
+                    aria-label={t('themes.remove', { name: themeLabel(theme.id, uiLocale, customThemes) })}
+                    onClick={() => customAction(() => api.removeTheme(token, theme.id))}
+                    className="-ml-2 rounded-r-full border border-l-0 border-neutral-300 px-2 text-sm text-neutral-600 hover:text-red-700"
+                  >
+                    ×
+                  </button>
+                )}
               </li>
             )
           })}
         </ul>
+        <form onSubmit={addCustom} className="flex flex-wrap gap-2">
+          <input
+            value={newLabel}
+            onChange={(e) => setNewLabel(e.target.value)}
+            maxLength={CUSTOM_THEME_LIMITS.maxLabelLength}
+            aria-label={t('themes.customLabel')}
+            placeholder={t('themes.customPlaceholder')}
+            className="min-w-0 flex-1 rounded border border-neutral-300 px-3 py-1 text-sm"
+          />
+          <button
+            type="submit"
+            disabled={!newLabel.trim() || customThemes.length >= CUSTOM_THEME_LIMITS.maxCount}
+            className="rounded border border-neutral-300 px-3 py-1 text-sm disabled:opacity-50"
+          >
+            {t('themes.add')}
+          </button>
+        </form>
+        <p className="text-xs text-neutral-500">{t('themes.customHint', { max: CUSTOM_THEME_LIMITS.maxCount })}</p>
       </section>
 
       <div className="space-y-3">

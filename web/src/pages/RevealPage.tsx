@@ -79,7 +79,7 @@ export default function RevealPage() {
           <p className="text-3xl font-bold break-words">🎁 {data.giftee}</p>
           {data.themeId && (
             <p className="text-sm">
-              {t('reveal.theme')}: <strong>{themeLabel(data.themeId, uiLocale)}</strong>
+              {t('reveal.theme')}: <strong>{data.themeLabel ?? themeLabel(data.themeId, uiLocale)}</strong>
             </p>
           )}
           <p className="text-xs opacity-80">{t('reveal.secret')}</p>

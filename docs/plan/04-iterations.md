@@ -107,11 +107,14 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 ## Iteration 4: Custom themes and theme polish
 
 **Scope**
-- The predefined list and selection ship in Iteration 2. This iteration adds **custom themes** (organizer types their own labels, stored per party) and a reorder/search nicety for the chip list if needed.
-- Theme nudge reminder copy.
+- The predefined list and selection ship in Iteration 2. This iteration adds **custom themes**: the organizer types a label (max 40 characters, up to 20 per party), stored per party in `parties.custom_themes` as `{id, label}`. One label, shown as-is in both languages. A new custom theme joins the pool already selected.
+- A search box filters the chip list. Reordering was dropped as unnecessary.
+- Removing a custom theme is blocked (`theme_in_use`) while it is dealt to someone, until the next redo.
+- Theme nudge reminder copy moves to Iteration 7 (reminders), where it is used.
 
 **Done when**
-- Custom themes persist, take part in the unique dealing, and appear in both languages' views.
+- Custom themes persist, take part in the unique dealing, and appear in both languages' views (reveal page returns the custom label).
+- Duplicate labels (against built-ins in either language and other custom themes) are rejected.
 
 ---
 

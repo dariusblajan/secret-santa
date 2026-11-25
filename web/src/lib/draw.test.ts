@@ -10,6 +10,8 @@ import { inviteEmail } from '../../../supabase/functions/_shared/emails/invite.t
 import { serializeManage, type ParticipantRow, type PartyRow } from '../../../supabase/functions/_shared/serialize.ts'
 import {
   ALL_THEME_IDS,
+  normalizeThemeLabel,
+  validateCustomTheme,
   dealThemes,
   sanitizeThemeIds,
   THEMES,
@@ -221,5 +223,44 @@ describe('invite email', () => {
 
   it('omits the budget line when there is none', () => {
     expect(inviteEmail({ ...data, budgetAmount: null }).text).not.toContain('Budget')
+  })
+})
+
+describe('custom themes', () => {
+  const custom = [
+    { id: 'c-1', label: 'Pottery' },
+    { id: 'c-2', label: 'Origami' },
+  ]
+
+  it('keeps custom ids in the pool and drops unknown ones', () => {
+    expect(sanitizeThemeIds(['c-2', 'cozy', 'c-9', 'nope'], custom)).toEqual(['cozy', 'c-2'])
+    expect(sanitizeThemeIds(['c-1'])).toEqual([])
+  })
+
+  it('deals custom themes uniquely together with built-ins', () => {
+    const ids = people(5).map((p) => p.id)
+    const pool = ['cozy', 'sports', 'c-1', 'c-2', 'books']
+    for (let run = 0; run < 200; run++) {
+      const dealt = dealThemes(pool, ids, custom)
+      expect(new Set(Object.values(dealt))).toEqual(new Set(pool))
+    }
+  })
+
+  it('shows the same label in both languages', () => {
+    expect(themeLabel('c-1', 'en', custom)).toBe('Pottery')
+    expect(themeLabel('c-1', 'ro', custom)).toBe('Pottery')
+  })
+
+  it('validates labels', () => {
+    expect(normalizeThemeLabel('  Hand   made ')).toBe('Hand made')
+    expect(validateCustomTheme('', custom)).toBe('theme_label_required')
+    expect(validateCustomTheme('x'.repeat(41), custom)).toBe('theme_label_too_long')
+    expect(validateCustomTheme('pottery', custom)).toBe('theme_duplicate')
+    expect(validateCustomTheme('cozy', custom)).toBe('theme_duplicate')
+    expect(validateCustomTheme('Cărți', custom)).toBe('theme_duplicate')
+    expect(validateCustomTheme('Knitting', custom)).toBeNull()
+    expect(validateCustomTheme('Knitting', Array.from({ length: 20 }, (_, i) => ({ id: `c-${i}`, label: `T${i}` })))).toBe(
+      'too_many_themes',
+    )
   })
 })
