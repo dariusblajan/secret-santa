@@ -154,15 +154,15 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 
 ## Iteration 6: Import participants from a file
 
-> **Status:** `.csv` import is built. `.xlsx` / `.xls` support is pending: it needs the SheetJS library (see the lazy-loading note below), which was not installed yet.
+> **Decision:** CSV only. `.xlsx` / `.xls` were dropped (the safe SheetJS build isn't on npm); Excel users use "Save as CSV".
 
 **Scope**
-- Import participants from a simple `.csv`, `.xlsx` or `.xls` file into the participants editor.
+- Import participants from a simple `.csv` file into the participants editor.
 - Parsed **in the browser**: the file never leaves the device. The existing save flow and server validation are reused, so there is **no new backend function**.
 - Available in the editor while the party is a draft (create form and manage page), the same window in which participants are editable.
 
 **File format**
-- One header row, columns `name`, `email`, `gender` (header names case-insensitive, trimmed; extra columns ignored). Only the first sheet of a workbook is read.
+- One header row, columns `name`, `email`, `gender` (header names case-insensitive, trimmed; extra columns ignored).
 - `gender` is optional: `B` = boy, `G` = girl, case-insensitive, empty allowed. Any other value is flagged.
 - CSV: UTF-8 (with or without BOM) and both `,` and `;` delimiters (Romanian Excel exports `;`). Fully empty rows are ignored.
 - A downloadable template file (name, email, gender) sits next to the import button.
@@ -181,7 +181,7 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 - All copy in ro and en
 
 **Behaviour**
-- Dedicated parsing module in `web/src/lib/` with a pure function `parseParticipantsFile(rows)`, so Vitest can test it without a browser. The xlsx parsing library (e.g. SheetJS) is loaded lazily, only when the dialog opens, to keep the main bundle small.
+- Dedicated parsing module in `web/src/lib/` with a pure function `parseParticipantsFile(rows)`, so Vitest can test it without a browser.  No spreadsheet library is needed.
 - File size cap (a few hundred KB) and a row cap; parsing failures show a friendly error ("could not read this file").
 - Email normalisation (trim, lowercase) matches the editor, and the same shared validators from `_shared` are used.
 - Rows are imported as plain text only. Spreadsheet formulas are never evaluated, and cell values starting with `=`, `+`, `-` or `@` are kept as text.
@@ -189,7 +189,6 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 
 **Done when**
 - Parser tests pass: header variants, `B`/`G`/`b`/`g`/empty, unknown gender, `;` and `,` CSV, BOM, empty rows, duplicate emails (in file and against existing), more than 15 rows, wrong columns.
-- A `.csv`, `.xlsx` and `.xls` sample each import to the same preview.
 - Imported rows keep the organizer first and respect the cap; nothing persists until save.
 - Server-side validation still rejects bad data if the browser is bypassed.
 
