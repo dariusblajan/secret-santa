@@ -118,7 +118,8 @@
     "unknown": "Ceva nu a mers bine. Încearcă din nou.",
     "cannot_start": "Petrecerea nu poate fi pornită încă. Verifică avertismentul de deasupra butonului.",
     "conflict": "Participanții s-au schimbat în timpul pornirii. Încearcă din nou.",
-    "not_started": "Petrecerea nu a început încă."
+    "not_started": "Petrecerea nu a început încă.",
+    "event_passed": "Data evenimentului a trecut, deci acest lucru nu mai este posibil."
   },
   "notFound": {
     "title": "Pagina nu a fost găsită",
@@ -163,6 +164,22 @@
     "secret": "Păstrează secretul. Doar tu poți vedea această pagină.",
     "whosComing": "Cine vine",
     "notFound": "Acest link nu este valid. Cere organizatorului să îți retrimită invitația.",
-    "loadError": "Nu am putut încărca rezultatul tău."
+    "loadError": "Nu am putut încărca rezultatul tău.",
+    "remadeTitle": "Extragerea a fost refăcută.",
+    "remadeBody": "Potrivirea și tema primite înainte nu mai sunt valabile. Acesta este noul tău rezultat.",
+    "tapToReveal": "Atinge ca să afli cine ți-a ieșit",
+    "tapHint": "Asigură-te că nimeni nu se uită peste umărul tău.",
+    "hide": "Ascunde din nou"
+  },
+  "redo": {
+    "title": "Refă extragerea",
+    "intro": "Refaci toate potrivirile și temele. Mai poți ajusta tipul de potrivire și temele cadourilor mai jos. Toți păstrează linkul lor privat și primesc un email despre noua extragere.",
+    "button": "Refă extragerea",
+    "dialogTitle": "Refaci extragerea?",
+    "dialogBody": "Se înlocuiesc toate potrivirile și temele pentru cei {{count}} participanți și se trimite email tuturor. Potrivirile anterioare nu mai sunt valabile.",
+    "dialogConfirm": "Refă și trimite email tuturor",
+    "warningTitle": "Nu se poate reface încă",
+    "done": "Extragerea a fost refăcută și toți au primit email.",
+    "eventPassed": "Data evenimentului a trecut, deci extragerea nu mai poate fi refăcută."
   }
 }

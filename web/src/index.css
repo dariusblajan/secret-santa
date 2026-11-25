@@ -8,3 +8,24 @@ body {
   margin: 0;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
+
+@keyframes reveal-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.reveal-pop {
+  animation: reveal-pop 500ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-pop {
+    animation: none;
+  }
+}

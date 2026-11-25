@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
     const [{ data: party }, { data: giftee }, { data: everyone }] = await Promise.all([
       db
         .from('parties')
-        .select('name, event_at, location_name, budget_amount, locale, status')
+        .select('name, event_at, location_name, budget_amount, locale, status, draw_version')
         .eq('id', me.party_id)
         .single(),
       db.from('participants').select('name').eq('id', me.giftee_id).single(),
@@ -61,6 +61,8 @@ Deno.serve(async (req) => {
       giftee: giftee.name,
       themeId: me.theme,
       participantNames: (everyone ?? []).map((p) => p.name),
+      drawVersion: party.draw_version,
+      remade: party.draw_version > 1,
     })
   } catch (err) {
     console.error('reveal failed', err)

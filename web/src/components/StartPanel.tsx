@@ -15,12 +15,15 @@ export default function StartPanel({ token, data, onChange }: Props) {
   const { t, i18n } = useTranslation()
   const uiLocale = i18n.language === 'ro' ? 'ro' : 'en'
   const { participants } = data
+  const redo = data.party.status === 'drawn'
+  const k = redo ? 'redo' : 'start'
 
   const [sameGender, setSameGender] = useState(data.party.sameGender)
   const [themeIds, setThemeIds] = useState<string[]>(data.party.themeIds)
   const [confirming, setConfirming] = useState(false)
   const [starting, setStarting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [done, setDone] = useState(false)
 
   // Theme changes are saved one after another so the last click always wins.
   const saveChain = useRef<Promise<unknown>>(Promise.resolve())
@@ -46,9 +49,12 @@ export default function StartPanel({ token, data, onChange }: Props) {
   async function start() {
     setStarting(true)
     setError(null)
+    setDone(false)
     try {
       await saveChain.current // make sure the latest theme selection is stored first
-      onChange(await api.startParty(token, sameGender))
+      onChange(await (redo ? api.redoDraw(token, sameGender) : api.startParty(token, sameGender)))
+      setConfirming(false)
+      setDone(redo)
     } catch (err) {
       setError(apiErrorMessage(t, err))
       setConfirming(false)
@@ -59,6 +65,12 @@ export default function StartPanel({ token, data, onChange }: Props) {
 
   return (
     <div className="space-y-8">
+      {redo && (
+        <div className="space-y-1">
+          <h3 className="text-xl font-semibold">{t('redo.title')}</h3>
+          <p className="text-sm text-neutral-600">{t('redo.intro')}</p>
+        </div>
+      )}
       <fieldset className="space-y-2">
         <legend className="text-lg font-semibold">{t('matching.title')}</legend>
         <label className="flex items-center gap-2">
@@ -117,13 +129,18 @@ export default function StartPanel({ token, data, onChange }: Props) {
             role="status"
             className="space-y-1 rounded border border-amber-500 bg-amber-50 p-3 text-sm text-amber-950 dark:bg-amber-950 dark:text-amber-50"
           >
-            <p className="font-medium">⚠️ {t('start.warningTitle')}</p>
+            <p className="font-medium">⚠️ {t(`${k}.warningTitle`)}</p>
             <ul className="list-disc space-y-1 pl-5">
               {issues.map((issue, i) => (
                 <li key={i}>{issueMessage(t, issue)}</li>
               ))}
             </ul>
           </div>
+        )}
+        {done && (
+          <p className="text-sm text-green-700" role="status">
+            ✓ {t('redo.done')}
+          </p>
         )}
         {error && (
           <p className="text-sm text-red-600" role="alert">
@@ -136,7 +153,7 @@ export default function StartPanel({ token, data, onChange }: Props) {
           onClick={() => setConfirming(true)}
           className="rounded bg-red-700 px-5 py-2 font-medium text-white disabled:opacity-50"
         >
-          {starting ? t('start.starting') : t('start.button')}
+          {starting ? t('start.starting') : t(`${k}.button`)}
         </button>
       </div>
 
@@ -152,9 +169,9 @@ export default function StartPanel({ token, data, onChange }: Props) {
             className="w-full max-w-md space-y-4 rounded bg-white p-6 text-neutral-900 shadow-lg"
           >
             <h3 id="start-title" className="text-lg font-semibold">
-              {t('start.dialogTitle')}
+              {t(`${k}.dialogTitle`)}
             </h3>
-            <p className="text-sm">{t('start.dialogBody', { count: participants.length })}</p>
+            <p className="text-sm">{t(`${k}.dialogBody`, { count: participants.length })}</p>
             <div className="flex justify-end gap-3">
               <button
                 ref={cancelRef}
@@ -171,7 +188,7 @@ export default function StartPanel({ token, data, onChange }: Props) {
                 onClick={() => void start()}
                 className="rounded bg-red-700 px-4 py-2 font-medium text-white disabled:opacity-60"
               >
-                {starting ? t('start.starting') : t('start.dialogConfirm')}
+                {starting ? t('start.starting') : t(`${k}.dialogConfirm`)}
               </button>
             </div>
           </div>

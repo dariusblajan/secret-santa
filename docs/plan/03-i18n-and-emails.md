@@ -28,7 +28,7 @@ Languages: **Romanian (ro)** and **English (en)** for both UI and emails.
 |---|---|---|---|
 | `admin_link` | Organizer | Party created / link re-send | Admin link, "keep this link private" |
 | `invite` | Everyone (incl. organizer) | First draw | Party name, date/time, location, budget, participant names, reveal link, theme note |
-| `redo` | Everyone | Redo draw | **Prominent**: "The draw has been remade, disregard your previous match." New reveal link (same link), what changed |
+| `redo` | Everyone | Redo draw | **Prominent**: "The draw has been remade, disregard your previous match." Points to the original invite link, which still works and shows the new result (no new link unless the person uses Resend) |
 | `reminder_countdown` | Everyone | Manual / scheduled | "N days left until {party}" + date/place |
 | `reminder_budget` | Everyone | Manual / scheduled | "Stay within the agreed budget: {budget}" |
 | `reminder_match` | Everyone | Manual / scheduled | "You're getting a gift for {name}, theme {theme}" |

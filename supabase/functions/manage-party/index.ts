@@ -3,6 +3,7 @@ import { json, preflight } from '../_shared/cors.ts'
 import { adminClient } from '../_shared/db.ts'
 import { checkDrawable, checkThemes, drawAssignments, type DrawIssue } from '../_shared/draw.ts'
 import { inviteEmail } from '../_shared/emails/invite.ts'
+import { redoEmail } from '../_shared/emails/redo.ts'
 import { serializeManage, type ParticipantRow, type PartyRow } from '../_shared/serialize.ts'
 import { dealThemes, sanitizeThemeIds } from '../_shared/themes.ts'
 import { bucharestToDate } from '../_shared/time.ts'
@@ -44,27 +45,33 @@ async function load(db: Db, adminHash: string) {
   return rows ? serializeManage(rows.party, rows.participants) : null
 }
 
-/** Email one participant their private reveal link and record success. Returns whether it was sent. */
+/**
+ * Email one participant about the draw and record success. Returns whether it was sent.
+ * First draw: invite with their private link. After a redo: the "draw was remade" email,
+ * with a link only when a fresh token was just created (Resend); otherwise they use their original link.
+ */
 async function sendInvite(
   db: Db,
   party: PartyRow,
   recipient: { id: string; name: string; email: string },
-  token: string,
+  token: string | null,
   allNames: string[],
+  remade: boolean,
 ): Promise<boolean> {
-  const sent = await sendEmail({
-    to: { email: recipient.email, name: recipient.name },
-    ...inviteEmail({
-      locale: party.locale,
-      recipientName: recipient.name,
-      partyName: party.name,
-      eventAt: party.event_at,
-      locationName: party.location_name,
-      budgetAmount: party.budget_amount === null ? null : Number(party.budget_amount),
-      participantNames: allNames,
-      revealUrl: revealUrl(token),
-    }),
-  })
+  const common = {
+    locale: party.locale,
+    recipientName: recipient.name,
+    partyName: party.name,
+    eventAt: party.event_at,
+    locationName: party.location_name,
+    budgetAmount: party.budget_amount === null ? null : Number(party.budget_amount),
+    participantNames: allNames,
+  }
+  const content =
+    remade || !token
+      ? redoEmail({ ...common, revealUrl: token ? revealUrl(token) : undefined })
+      : inviteEmail({ ...common, revealUrl: revealUrl(token) })
+  const sent = await sendEmail({ to: { email: recipient.email, name: recipient.name }, ...content })
   if (sent) {
     await db.from('participants').update({ invited_at: new Date().toISOString() }).eq('id', recipient.id)
   }
@@ -128,12 +135,11 @@ Deno.serve(async (req) => {
     if (body.action === 'set-themes') {
       const rows = await loadRows(db, adminHash)
       if (!rows) return notFound(req)
-      if (rows.party.status !== 'draft') return json(req, { code: 'locked', message: 'Party already started' }, 409)
+      // The theme pool stays editable after the start so the organizer can adjust it before a redo.
       const { error } = await db
         .from('parties')
         .update({ theme_ids: sanitizeThemeIds(body.themeIds) })
         .eq('id', rows.party.id)
-        .eq('status', 'draft')
       if (error) throw error
       const data = await load(db, adminHash)
       return data ? json(req, data) : notFound(req)
@@ -181,7 +187,55 @@ Deno.serve(async (req) => {
 
       // Send invites. A failure only leaves that person's invited_at empty (UI offers Resend).
       const allNames = participants.map((p) => p.name)
-      await Promise.all(participants.map((p) => sendInvite(db, party, p, tokens[p.id], allNames)))
+      await Promise.all(participants.map((p) => sendInvite(db, party, p, tokens[p.id], allNames, false)))
+
+      const data = await load(db, adminHash)
+      return data ? json(req, data) : notFound(req)
+    }
+
+    // ---- redo the draw (new matches and themes, same reveal links) ---------
+    if (body.action === 'redo') {
+      const rows = await loadRows(db, adminHash)
+      if (!rows) return notFound(req)
+      const { party, participants } = rows
+      if (party.status !== 'drawn') return json(req, { code: 'not_started', message: 'Party not started' }, 409)
+      if (new Date(party.event_at).getTime() <= Date.now()) {
+        return json(req, { code: 'event_passed', message: 'The event date has passed' }, 409)
+      }
+
+      const sameGender = body.sameGender === true
+      const people = participants.map((p) => ({ id: p.id, name: p.name, gender: p.gender }))
+      const pool = sanitizeThemeIds(party.theme_ids)
+      const issues: DrawIssue[] = [...checkDrawable(people, sameGender), ...checkThemes(pool.length, people.length)]
+      if (issues.length > 0) return json(req, { code: 'cannot_start', message: 'Cannot redo', issues }, 422)
+
+      const giftees = drawAssignments(people, sameGender)
+      const themes = dealThemes(pool, people.map((p) => p.id))
+      const assignments = people.map((p) => ({ id: p.id, giftee_id: giftees[p.id], theme: themes[p.id] }))
+
+      const { error } = await db.rpc('redo_draw_tx', {
+        p_admin_hash: adminHash,
+        p_same_gender: sameGender,
+        p_assignments: assignments,
+      })
+      if (error) {
+        if (error.message.includes('not_found')) return notFound(req)
+        if (error.message.includes('not_started')) {
+          return json(req, { code: 'not_started', message: 'Party not started' }, 409)
+        }
+        if (error.message.includes('event_passed')) {
+          return json(req, { code: 'event_passed', message: 'The event date has passed' }, 409)
+        }
+        if (error.message.includes('conflict')) {
+          return json(req, { code: 'conflict', message: 'Participants changed, please retry' }, 409)
+        }
+        throw error
+      }
+
+      // Everyone keeps their link, so the redo email carries no link. A failure leaves invited_at empty (Resend).
+      const remadeParty = { ...party, draw_version: party.draw_version + 1 }
+      const allNames = participants.map((p) => p.name)
+      await Promise.all(participants.map((p) => sendInvite(db, remadeParty, p, null, allNames, true)))
 
       const data = await load(db, adminHash)
       return data ? json(req, data) : notFound(req)
@@ -205,7 +259,7 @@ Deno.serve(async (req) => {
         .eq('party_id', party.id)
       if (error) throw error
 
-      await sendInvite(db, party, target, newToken, participants.map((p) => p.name))
+      await sendInvite(db, party, target, newToken, participants.map((p) => p.name), party.draw_version > 1)
       const data = await load(db, adminHash)
       return data ? json(req, data) : notFound(req)
     }

@@ -39,6 +39,8 @@
 | D33 | Start blockers (same-gender mismatch, too few participants, too few themes) show an amber warning above the Start button and disable it | Confirmed |
 | D34 | Failed invites get a per-person Resend that rotates that person's link | Confirmed |
 | D35 | Custom themes move to Iteration 4 | Predefined list is enough for the first end-to-end run |
+| D42 | Reveal "opened" flag is set when the page loads; the tap-to-reveal state is remembered per device and draw version (localStorage) | Confirmed |
+| D43 | Redo keeps all reveal links; the redo email points to the original invite, Resend rotates a link. Matching mode and theme pool stay editable for a redo | Confirmed |
 | D36 | Optional **directional** exclusions ("A can't buy for B"), Iteration 5; combined with the matching mode | Confirmed |
 | D37 | Exclusions are editable any time before start and before a redo; the redo honours them | Confirmed |
 | D38 | Infeasible exclusions show the amber pre-flight warning and disable Start/Redo; feasibility is checked with the same search the draw uses | Confirmed |

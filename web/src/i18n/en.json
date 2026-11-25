@@ -117,7 +117,8 @@
     "unknown": "Something went wrong. Please try again.",
     "cannot_start": "The party can't be started yet. Check the warning above the button.",
     "conflict": "The participants changed while starting. Please try again.",
-    "not_started": "The party hasn't started yet."
+    "not_started": "The party hasn't started yet.",
+    "event_passed": "The event date has passed, so this can no longer be done."
   },
   "notFound": {
     "title": "Page not found",
@@ -162,6 +163,22 @@
     "secret": "Keep this a secret. Only you can see this page.",
     "whosComing": "Who's coming",
     "notFound": "This link is not valid. Ask the organizer to resend your invite.",
-    "loadError": "Could not load your match."
+    "loadError": "Could not load your match.",
+    "remadeTitle": "The draw was remade.",
+    "remadeBody": "Your previous match and theme are no longer valid. This is your new result.",
+    "tapToReveal": "Tap to reveal your match",
+    "tapHint": "Make sure nobody is looking over your shoulder.",
+    "hide": "Hide again"
+  },
+  "redo": {
+    "title": "Redo the draw",
+    "intro": "Remake all matches and themes. You can still adjust the matching mode and gift themes below. Everyone keeps their private link and is emailed about the new draw.",
+    "button": "Redo draw",
+    "dialogTitle": "Redo the draw?",
+    "dialogBody": "This replaces all matches and themes for all {{count}} participants and emails everyone. Previous matches stop being valid.",
+    "dialogConfirm": "Redo and email everyone",
+    "warningTitle": "Can't redo yet",
+    "done": "The draw was remade and everyone was emailed.",
+    "eventPassed": "The event date has passed, so the draw can no longer be redone."
   }
 }

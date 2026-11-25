@@ -65,6 +65,7 @@ export default function ManagePage() {
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [serverErrors, setServerErrors] = useState<ValidationError[]>([])
+  const [now] = useState(() => Date.now())
 
   const load = useCallback(async () => {
     try {
@@ -183,7 +184,14 @@ export default function ManagePage() {
       {isDraft ? (
         <StartPanel token={token} data={data} onChange={setData} />
       ) : (
-        <p className="text-xs text-neutral-500">{t('manage.lockedNote')}</p>
+        <>
+          <p className="text-xs text-neutral-500">{t('manage.lockedNote')}</p>
+          {new Date(party.eventAt).getTime() > now ? (
+            <StartPanel token={token} data={data} onChange={setData} />
+          ) : (
+            <p className="text-sm text-neutral-600">{t('redo.eventPassed')}</p>
+          )}
+        </>
       )}
     </section>
   )

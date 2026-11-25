@@ -66,6 +66,8 @@ export interface RevealData {
   giftee: string
   themeId: string | null
   participantNames: string[]
+  drawVersion: number
+  remade: boolean
 }
 
 /** Call a Supabase Edge Function. Access control is enforced inside each function (tokens / access code). */
@@ -111,6 +113,7 @@ export const api = {
   updateParty: (token: string, party: PartyInput) => manage(token, 'update', { party }),
   setThemes: (token: string, themeIds: string[]) => manage(token, 'set-themes', { themeIds }),
   startParty: (token: string, sameGender: boolean) => manage(token, 'start', { sameGender }),
+  redoDraw: (token: string, sameGender: boolean) => manage(token, 'redo', { sameGender }),
   resendInvite: (token: string, participantId: string) => manage(token, 'resend', { participantId }),
   reveal: (token: string) => callFunction<RevealData>('reveal', { token }),
 }

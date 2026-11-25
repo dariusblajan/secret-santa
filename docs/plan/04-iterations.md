@@ -88,9 +88,10 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 ## Iteration 3: Reveal polish and redo draw
 
 **Flow**
-1. Reveal page gains the tap-to-reveal interaction and mobile-first polish; revisiting the link works.
-2. Organizer chooses **Redo draw** → warning dialog → new matches and themes → `redo` email to everyone.
-3. Participant reopens the same link, sees the new result with a "draw was remade" banner.
+1. Reveal page gains the tap-to-reveal interaction and mobile-first polish. After the first tap the match is remembered on that device for the current draw version, so revisiting the link shows it directly (a redo hides it again). The "opened" flag the organizer sees is still set when the page loads.
+2. Organizer chooses **Redo draw** (any time before the event date) → the Matching and Themes panels stay editable and apply to the redo → warning dialog → new matches and themes → `redo` email to everyone.
+3. The redo email tells people to disregard the old match and to open the link from their original invite (links are not rotated, since only hashes are stored). Failed sends show **Resend**, which rotates that person's link and emails the new one.
+4. Participant reopens the same link, sees the new result with a "draw was remade" banner.
 
 **UI**
 - Tap-to-reveal animation, banner for remade draw
