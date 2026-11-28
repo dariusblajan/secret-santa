@@ -21,8 +21,8 @@ None of this is in the repo; it's accounts and settings. We'll write the exact s
 - `PUBLIC_APP_URL` (`https://dariusblajan.github.io/secret-santa/`)
 
 **Supabase project settings**
-- Enable extensions `pg_cron` and `pg_net` (done in a migration).
-- Store the service key for cron in **Supabase Vault** so the scheduled job can call the reminder function.
+- Enable extensions `pg_cron` and `pg_net` (done in a migration), used only by the retention `cleanup` job.
+- Store the service key for cron in **Supabase Vault** so the scheduled job can call `cleanup`.
 
 After that, day to day: push to `main` → the workflows deploy everything. There's nothing to run or host yourself.
 
@@ -48,7 +48,7 @@ https://<project-ref>.supabase.co/functions/v1/<function-name>
 | `manage-party` (`get`/`update`) | admin token | party/participant/theme/exclusion edits (imported participants arrive as an ordinary participant list) | party + participants + exclusions + statuses (no matches) |
 | `start-draw` | admin token | `{ sameGender, redo? }` | status; sends `invite` or `redo` emails. Draws using the party's stored exclusions; errors with a typed reason (`no_allowed_giftee`, `no_valid_cycle`, ...) if infeasible |
 | `reveal` | reveal token | `{}` | own giftee, theme, party info, names, `drawVersion`, `remade` flag |
-| `send-reminder` | admin token (manual) / service key (cron) | `{ kind, customMessage? }` | sent count |
+| `send-reminder` | admin token | `{ kind: 'countdown' \| 'theme' \| 'match' \| 'custom', customMessage? }` | sent count; updates `reminders_last_sent` |
 | `resend-link` | email + party id | | re-sends admin or reveal link (rate-limited) |
 | `cleanup` | service key (cron) | | deletes expired parties |
 
@@ -71,5 +71,5 @@ cd web && npm run dev           # Vite at localhost:5173
 
 ## 6.5 Free-tier notes
 
-- Supabase free projects **pause after ~1 week of inactivity**. Unpause from the dashboard before an event, or add a tiny keep-alive (the hourly reminder cron may already count as activity, to be verified).
+- Supabase free projects **pause after ~1 week of inactivity**. Unpause from the dashboard before an event, or add a tiny keep-alive (the `cleanup` cron may already count as activity, to be verified).
 - Brevo free: 300 emails/day, far above 15 people × a few emails per party.

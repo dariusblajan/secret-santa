@@ -15,6 +15,7 @@ export interface PartyRow {
   same_gender_mode: boolean
   theme_ids: string[]
   custom_themes?: unknown
+  reminders_last_sent?: Record<string, string> | null
   [key: string]: unknown
 }
 
@@ -48,6 +49,7 @@ export function serializeManage(party: PartyRow, participants: ParticipantRow[],
       sameGender: party.same_gender_mode,
       themeIds: party.theme_ids,
       customThemes: parseCustomThemes(party.custom_themes),
+      remindersLastSent: party.reminders_last_sent ?? {},
     },
     // Organizer input, not a result: safe to return.
     exclusions: exclusions.map((x) => ({ giverId: x.giver_id, gifteeId: x.giftee_id })),

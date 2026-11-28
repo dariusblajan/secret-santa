@@ -110,7 +110,7 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 - The predefined list and selection ship in Iteration 2. This iteration adds **custom themes**: the organizer types a label (max 40 characters, up to 20 per party), stored per party in `parties.custom_themes` as `{id, label}`. One label, shown as-is in both languages. A new custom theme joins the pool already selected.
 - A search box filters the chip list. Reordering was dropped as unnecessary.
 - Removing a custom theme is blocked (`theme_in_use`) while it is dealt to someone, until the next redo.
-- Theme nudge reminder copy moves to Iteration 7 (reminders), where it is used.
+- Theme reminder copy lives in Iteration 7 (reminders), where it is used.
 
 **Done when**
 - Custom themes persist, take part in the unique dealing, and appear in both languages' views (reveal page returns the custom label).
@@ -196,22 +196,26 @@ Legend: **Flow** = use case to review. **UI** = screens to review. **Done when**
 
 ## Iteration 7: Reminders
 
+Manual only, no scheduler. Three presets now, a custom message, and a registry so more presets can be added later.
+
 **Flow**
-1. Manage page → Reminders: pick a preset (countdown, budget, your match, last call, theme nudge) or write a custom message.
-2. Send now → confirmation → each participant gets their own email.
-3. Toggle scheduled presets (7 days, 2 days, day before). `pg_cron` sends them automatically.
-4. Reminder history list (kind, time, count).
+1. Manage page → Reminders: pick a preset (countdown, theme, your match) or write a custom message.
+2. Optional preview (generic, no matches shown) → Send now → confirmation → each participant gets their own email.
+3. Each option shows a "Last sent {time}" note (never blocks sending).
 
 **UI**
-- Reminders panel and presets
-- Custom message composer with preview
-- Schedule toggles and history
+- Reminders panel with the three presets, a custom message composer and an optional generic preview.
+- "Last sent" note per option, stored in `parties.reminders_last_sent`.
+- Disabled with an explanation before the draw and after the event date.
 
 **Done when**
-- Scheduled sends fire once (idempotent) and respect the latest `draw_version`.
-- Manual and scheduled use the same templates.
+- Each preset renders correctly in EN and RO with a plain "Days left: {n}" number.
+- Custom messages are HTML-escaped and wrapped in the party footer.
+- Adding a new preset means adding one registry entry, nothing else.
+- Tone check: no urgency language in any template.
+- Sends use the latest `draw_version`.
 - Organizer UI never shows content containing matches.
-- No reminder (scheduled or manual) can be sent after the event date.
+- No reminder can be sent after the event date.
 
 ---
 

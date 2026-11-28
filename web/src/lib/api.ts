@@ -1,5 +1,6 @@
 import type { DrawIssue } from '../../../supabase/functions/_shared/draw.ts'
 import type { CustomTheme } from '../../../supabase/functions/_shared/themes.ts'
+import type { ReminderKind } from '../../../supabase/functions/_shared/emails/reminder.ts'
 import type { PartyInput, ValidationError } from '../../../supabase/functions/_shared/validation.ts'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined
@@ -39,6 +40,7 @@ export interface ManageParty {
   sameGender: boolean
   themeIds: string[]
   customThemes: CustomTheme[]
+  remindersLastSent: Record<string, string>
 }
 
 export interface ManageParticipant {
@@ -130,5 +132,11 @@ export const api = {
   startParty: (token: string, sameGender: boolean) => manage(token, 'start', { sameGender }),
   redoDraw: (token: string, sameGender: boolean) => manage(token, 'redo', { sameGender }),
   resendInvite: (token: string, participantId: string) => manage(token, 'resend', { participantId }),
+  sendReminder: (token: string, kind: ReminderKind, customMessage?: string) =>
+    callFunction<{ sent: number; failed: number; remindersLastSent: Record<string, string> }>('send-reminder', {
+      token,
+      kind,
+      customMessage,
+    }),
   reveal: (token: string) => callFunction<RevealData>('reveal', { token }),
 }

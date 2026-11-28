@@ -52,15 +52,8 @@ Directional: a row blocks only giver→giftee. Unique on `(party_id, giver_id, g
 | is_default | boolean | seeded from the generic list |
 | enabled | boolean | |
 
-### `reminders_log`
-| Column | Type | Notes |
-|---|---|---|
-| id | uuid | |
-| party_id | uuid | |
-| kind | text | `countdown`, `budget`, `your_match`, `last_call`, `custom` |
-| scheduled_for | timestamptz, null | null = manual |
-| sent_at | timestamptz | |
-| draw_version | int | |
+### Reminder last-sent note
+`parties.reminders_last_sent` (jsonb, default `{}`) maps a reminder kind to the ISO time it was last sent, e.g. `{"countdown": "2026-12-10T09:00:00Z"}`. All custom messages share the key `custom`. It is informational only and never blocks a send. No history table.
 
 RLS: all tables deny direct access from anon. Edge Functions use the service role and enforce token checks.
 
@@ -122,7 +115,7 @@ Test cases: n = 3..30, same-gender with uneven groups, group of 1 (error), group
 - Server steps (one transaction): bump `draw_version`, recompute `giftee_id` and `theme` for all participants, clear `revealed_at`, then send the **redo** email to everyone.
 - Same reveal links keep working. The reveal page shows a **"This draw was remade"** banner for the new version.
 - Redo email leads with the emphasis (see doc 3) and tells people to disregard the previous match.
-- Reminders after a redo use the latest `draw_version`. Any not-yet-sent scheduled reminders are unaffected.
+- Reminders sent after a redo use the latest draw (current giftee and theme).
 - Organizer only sees status (`invited`, `opened`), never matches or themes.
 
 ## 2.5 Participant editing rules

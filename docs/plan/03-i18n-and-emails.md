@@ -29,35 +29,35 @@ Languages: **Romanian (ro)** and **English (en)** for both UI and emails.
 | `admin_link` | Organizer | Party created / link re-send | Admin link, "keep this link private" |
 | `invite` | Everyone (incl. organizer) | First draw | Party name, date/time, location, budget, participant names, reveal link, theme note |
 | `redo` | Everyone | Redo draw | **Prominent**: "The draw has been remade, disregard your previous match." Points to the original invite link, which still works and shows the new result (no new link unless the person uses Resend) |
-| `reminder_countdown` | Everyone | Manual / scheduled | "N days left until {party}" + date/place |
-| `reminder_budget` | Everyone | Manual / scheduled | "Stay within the agreed budget: {budget}" |
-| `reminder_match` | Everyone | Manual / scheduled | "You're getting a gift for {name}, theme {theme}" |
-| `reminder_last_call` | Everyone | Manual / scheduled | "Party is tomorrow, wrap it up" |
-| `reminder_custom` | Everyone | Manual | Organizer's free text (with party footer) |
+| `reminder_countdown` | Everyone | Manual | Days left until {party}, date/place, a warm nudge |
+| `reminder_theme` | Everyone | Manual | Your gift theme + days left, encouragement to have fun with it |
+| `reminder_match` | Everyone | Manual | Who you're gifting, their theme, days left, "start thinking about the present" |
+| `reminder_custom` | Everyone | Manual | Organizer's free text, with the party details footer |
 | `email_fixed` | Participant | Email corrected after draw | New reveal link |
 
 Subject line examples (EN / RO, draft for your proofreading):
 
 - invite: "You're invited to {party}! Your Secret Santa match inside" / "Ești invitat(ă) la {party}! Află pe cine ai tras"
 - redo: "⚠️ The draw was remade. Please check your new match" / "⚠️ Extragerea a fost refăcută. Verifică noua ta potrivire"
-- countdown: "{n} days until {party}" / "Mai sunt {n} zile până la {party}"
-- budget: "Reminder: keep within {budget}" / "Reminder: încadrează-te în bugetul de {budget}"
-- match: "Don't forget who you're buying for 🎁" / "Nu uita pentru cine cumperi cadoul 🎁"
+- countdown: "Countdown to {party} 🎄" / "Numărătoarea inversă pentru {party} 🎄"
+- theme: "Your gift theme is {theme} ✨" / "Tema cadoului tău este {theme} ✨"
+- match: "Your Secret Santa is waiting for a gift 🎁" / "Cineva special așteaptă cadoul tău 🎁"
 
 Gendered Romanian wording uses **parentheses**: "invitat(ă)", "pregătit(ă)", "gata(ă)" style. Where a neutral rephrase is just as natural, prefer it. All such forms are listed in `ro.json` / the templates for proofreading.
 
-## 3.4 Reminder examples (body copy ideas)
+## 3.4 Reminder templates
 
-1. **Countdown:** "Only {n} days until {party} on {date} at {location}."
-2. **Budget:** "Friendly reminder: the agreed budget is {budget}. It's the thought that counts."
-3. **Your match:** "You're getting a gift for **{name}**. Your theme: **{theme}**. Don't forget!"
-4. **Last call:** "{party} is tomorrow. Time to wrap your gift."
-5. **Custom:** organizer message, e.g. "I'll bring the hot chocolate, you bring the gifts."
-6. **Theme nudge:** "Stuck on ideas? Your theme is **{theme}**. Anything cozy counts."
+Manual only: three presets plus a custom message. More presets can be added later, so templates live in a simple registry (one entry per kind) rather than hard-coded branches. All are sent per participant, in the party language. **Tone:** warm, optimistic, encouraging. Never urgent, never guilt-tripping, no "last chance" or "act now" wording, no all-caps, no alarm emojis (nothing like a scam email). Days left is computed at send time from `event_at`.
 
-Scheduled presets the organizer can toggle: 7 days before, 2 days before, day before. Each is idempotent via `reminders_log`.
+1. **Countdown:** "Days left until {party}: {n}. There's still plenty of time to find something lovely. We're looking forward to seeing you on {date} at {location}."
+2. **Theme:** "Your gift theme is **{theme}**. There's no wrong answer here, so have fun with it and follow your imagination. Days left: {n}."
+3. **Your match:** "You're picking a gift for **{name}**. Theme: **{theme}**. A thoughtful little something goes a long way. Days left: {n}."
 
-**No reminders after the event date:** both the scheduler and the manual send are blocked once `event_at` has passed (the manual button is disabled with an explanation).
+The day count is always shown as a plain number in a fixed phrase ("Days left: {n}" / "Zile rămase: {n}") so there are no singular/plural or today/tomorrow variants to get wrong.
+
+4. **Custom:** the organizer's own text, e.g. "I'll bring the hot chocolate, you bring the gifts." It is escaped, wrapped in the same party footer (date, place, days left), and sent to everyone. Keep the same tone guidance in the composer's helper text.
+
+**No reminders after the event date:** the manual send is blocked once `event_at` has passed (the button is disabled with an explanation).
 
 Reminders containing a match/theme are sent individually. The organizer's view only shows "sent to N participants".
 

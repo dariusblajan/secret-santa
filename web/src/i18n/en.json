@@ -126,7 +126,9 @@
     "cannot_start": "The party can't be started yet. Check the warning above the button.",
     "conflict": "The participants changed while starting. Please try again.",
     "not_started": "The party hasn't started yet.",
-    "event_passed": "The event date has passed, so this can no longer be done."
+    "event_passed": "The event date has passed, so this can no longer be done.",
+    "message_required": "Write a message first.",
+    "message_too_long": "That message is too long."
   },
   "notFound": {
     "title": "Page not found",
@@ -233,5 +235,37 @@
     "warningTitle": "Can't redo yet",
     "done": "The draw was remade and everyone was emailed.",
     "eventPassed": "The event date has passed, so the draw can no longer be redone."
+  },
+  "reminders": {
+    "title": "Reminders",
+    "intro": "Send everyone a friendly nudge. Each person gets their own email.",
+    "countdown": "Countdown",
+    "countdownHint": "Days left until the party, with the date and place.",
+    "theme": "Gift theme",
+    "themeHint": "Each person's own theme and a bit of encouragement.",
+    "match": "Who you're gifting",
+    "matchHint": "Each person's giftee and theme. Only they see it.",
+    "custom": "Custom message",
+    "customHint": "Write your own note. It comes with the party details.",
+    "messageLabel": "Your message",
+    "messagePlaceholder": "I'll bring the hot chocolate, you bring the gifts.",
+    "messageCount": "{{count}} / {{max}}",
+    "lastSent": "Last sent {{time}}",
+    "neverSent": "Not sent yet",
+    "preview": "Preview",
+    "hidePreview": "Hide preview",
+    "previewNote": "Sample with made-up names. Real emails use each person's own match and theme.",
+    "send": "Send reminder",
+    "sending": "Sending…",
+    "dialogTitle": "Send this reminder?",
+    "dialogBody": "This emails all {{count}} participants.",
+    "dialogConfirm": "Send to everyone",
+    "done": "Sent to {{count}} participants.",
+    "partial": "Sent to {{sent}} participants. {{failed}} could not be reached, you can try again.",
+    "allFailed": "Nothing was sent. Please try again.",
+    "eventPassed": "The event date has passed, so reminders can no longer be sent.",
+    "sampleName": "Alex",
+    "sampleGiftee": "Sam",
+    "sampleTheme": "Cozy"
   }
 }

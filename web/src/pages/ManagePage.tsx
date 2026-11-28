@@ -5,6 +5,7 @@ import { formatBudget, formatEventDateTime } from '../../../supabase/functions/_
 import type { ValidationError } from '../../../supabase/functions/_shared/validation.ts'
 import ParticipantList from '../components/ParticipantList'
 import PartyForm from '../components/PartyForm'
+import RemindersPanel from '../components/RemindersPanel'
 import StartPanel from '../components/StartPanel'
 import { api, ApiError, type ManageData } from '../lib/api'
 import { apiErrorMessage } from '../lib/errors'
@@ -185,9 +186,15 @@ export default function ManagePage() {
         <>
           <p className="note">{t('manage.lockedNote')}</p>
           {new Date(party.eventAt).getTime() > now ? (
-            <StartPanel token={token} data={data} onChange={setData} />
+            <>
+              <RemindersPanel token={token} data={data} onChange={setData} />
+              <StartPanel token={token} data={data} onChange={setData} />
+            </>
           ) : (
-            <p className="note">{t('redo.eventPassed')}</p>
+            <>
+              <p className="note">{t('reminders.eventPassed')}</p>
+              <p className="note">{t('redo.eventPassed')}</p>
+            </>
           )}
         </>
       )}

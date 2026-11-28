@@ -9,7 +9,6 @@ GitHub Pages serves **static files only**. It cannot:
 | Send emails | Needs a server-side API key |
 | Keep the draw secret from the organizer | Browser code and `localStorage` are inspectable |
 | Persist across devices | Participants open links on their own phones |
-| Run scheduled reminders | Needs a scheduler |
 
 **Conclusion:** GitHub Pages hosts the UI; a free-tier backend (Supabase) does the rest. Both live in the same repo, but are deployed to different places.
 
@@ -59,7 +58,7 @@ secret-santa/
 │     ├─ manage-party/        # get/update party + participants + exclusions (admin token)
 │     ├─ start-draw/          # draw (honouring exclusions) + redo + invite/redo emails
 │     ├─ reveal/              # participant token → own match only
-│     ├─ send-reminder/       # manual + scheduled
+│     ├─ send-reminder/       # manual, template-based
 │     ├─ cleanup/             # retention job
 │     └─ _shared/             # draw.ts, emails/ (en, ro), brevo.ts, tokens.ts
 └─ .github/workflows/
@@ -103,8 +102,7 @@ Rules:
 - Local dev: `supabase start` (Docker) for DB + functions, `vite dev` for UI, `.env.local` for URLs.
 - Environments: start with one production project plus local. Add a staging project only if needed.
 
-## 1.7 Reminder scheduling
+## 1.7 Reminders
 
-- Automated: `pg_cron` runs a job (e.g. hourly) that finds parties with due reminder presets and invokes `send-reminder`. A `reminders_log` table makes sends idempotent.
-- Manual: the organizer triggers a reminder from the manage page.
-- Both paths send **one email per participant**, so personalised content (match, theme) never passes through the organizer.
+- Manual only. There is no reminder scheduler: the organizer picks one of a few templates on the manage page and sends it when they want.
+- The send path sends **one email per participant**, so personalised content (match, theme) never passes through the organizer.

@@ -70,6 +70,15 @@ export function todayInBucharest(now: Date = new Date()): string {
   return isoToBucharestParts(now.toISOString()).date
 }
 
+/** Whole calendar days from `now` to the event, both read as Romanian dates (0 on the day itself). */
+export function daysUntilEvent(eventAtIso: string, now: Date = new Date()): number {
+  const toDay = (iso: string) => {
+    const [y, m, d] = isoToBucharestParts(iso).date.split('-').map(Number)
+    return Date.UTC(y, m - 1, d)
+  }
+  return Math.round((toDay(eventAtIso) - toDay(now.toISOString())) / 86_400_000)
+}
+
 export function dateLocaleTag(locale: 'en' | 'ro'): string {
   return locale === 'ro' ? 'ro-RO' : 'en-GB'
 }

@@ -21,7 +21,7 @@ type Db = ReturnType<typeof adminClient>
 
 // NOTE: giftee_id and theme are deliberately never selected here. The organizer must not see matches.
 const PARTY_COLUMNS =
-  'id, name, event_at, location_name, budget_amount, locale, status, draw_version, same_gender_mode, theme_ids, custom_themes'
+  'id, name, event_at, location_name, budget_amount, locale, status, draw_version, same_gender_mode, theme_ids, custom_themes, reminders_last_sent'
 const PARTICIPANT_COLUMNS = 'id, name, email, gender, is_organizer, invited_at, revealed_at'
 
 function revealUrl(token: string): string {

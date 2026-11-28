@@ -127,7 +127,9 @@
     "cannot_start": "Petrecerea nu poate fi pornită încă. Verifică avertismentul de deasupra butonului.",
     "conflict": "Participanții s-au schimbat în timpul pornirii. Încearcă din nou.",
     "not_started": "Petrecerea nu a început încă.",
-    "event_passed": "Data evenimentului a trecut, deci acest lucru nu mai este posibil."
+    "event_passed": "Data evenimentului a trecut, deci acest lucru nu mai este posibil.",
+    "message_required": "Scrie mai întâi un mesaj.",
+    "message_too_long": "Mesajul este prea lung."
   },
   "notFound": {
     "title": "Pagina nu a fost găsită",
@@ -234,5 +236,37 @@
     "warningTitle": "Nu se poate reface încă",
     "done": "Extragerea a fost refăcută și toți au primit email.",
     "eventPassed": "Data evenimentului a trecut, deci extragerea nu mai poate fi refăcută."
+  },
+  "reminders": {
+    "title": "Remindere",
+    "intro": "Trimite tuturor un mesaj prietenos. Fiecare primește propriul email.",
+    "countdown": "Numărătoare inversă",
+    "countdownHint": "Zilele rămase până la petrecere, cu data și locul.",
+    "theme": "Tema cadoului",
+    "themeHint": "Tema fiecăruia și puțină încurajare.",
+    "match": "Pentru cine cumperi",
+    "matchHint": "Persoana și tema fiecăruia. Doar el sau ea le vede.",
+    "custom": "Mesaj personalizat",
+    "customHint": "Scrie propriul mesaj. Vine împreună cu detaliile petrecerii.",
+    "messageLabel": "Mesajul tău",
+    "messagePlaceholder": "Eu aduc ciocolata caldă, voi aduceți cadourile.",
+    "messageCount": "{{count}} / {{max}}",
+    "lastSent": "Trimis ultima dată {{time}}",
+    "neverSent": "Netrimis încă",
+    "preview": "Previzualizare",
+    "hidePreview": "Ascunde previzualizarea",
+    "previewNote": "Exemplu cu nume inventate. Emailurile reale folosesc potrivirea și tema fiecăruia.",
+    "send": "Trimite reminderul",
+    "sending": "Se trimite…",
+    "dialogTitle": "Trimiți acest reminder?",
+    "dialogBody": "Se trimite email tuturor celor {{count}} participanți.",
+    "dialogConfirm": "Trimite tuturor",
+    "done": "Trimis către {{count}} participanți.",
+    "partial": "Trimis către {{sent}} participanți. {{failed}} nu au putut fi contactați, poți încerca din nou.",
+    "allFailed": "Nu s-a trimis nimic. Încearcă din nou.",
+    "eventPassed": "Data evenimentului a trecut, deci reminderele nu mai pot fi trimise.",
+    "sampleName": "Alex",
+    "sampleGiftee": "Sam",
+    "sampleTheme": "Confortabil"
   }
 }
