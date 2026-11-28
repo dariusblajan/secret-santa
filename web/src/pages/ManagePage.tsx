@@ -10,6 +10,7 @@ import StartPanel from '../components/StartPanel'
 import { api, ApiError, type ManageData } from '../lib/api'
 import { apiErrorMessage } from '../lib/errors'
 import { formFromManageData, toPartyInput } from '../lib/partyForm'
+import Loading from '../components/Loading'
 
 type LoadState = 'loading' | 'ready' | 'notFound' | 'error'
 
@@ -81,7 +82,7 @@ export default function ManagePage() {
     void load()
   }, [load])
 
-  if (state === 'loading') return <p>{t('common.loading')}</p>
+  if (state === 'loading') return <Loading />
   if (state === 'notFound') {
     return (
       <div className="grid gap-4">

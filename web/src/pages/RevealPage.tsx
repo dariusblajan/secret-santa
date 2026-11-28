@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { themeLabel } from '../../../supabase/functions/_shared/themes.ts'
 import { formatBudget, formatEventDateTime } from '../../../supabase/functions/_shared/time.ts'
 import { api, ApiError, type RevealData } from '../lib/api'
+import Loading from '../components/Loading'
 
 type LoadState = 'loading' | 'ready' | 'notFound' | 'error'
 
@@ -55,7 +56,7 @@ export default function RevealPage() {
     }
   }, [token])
 
-  if (state === 'loading') return <p className="note">{t('common.loading')}</p>
+  if (state === 'loading') return <Loading />
   if (state === 'notFound') return <p className="callout callout-warn">{t('reveal.notFound')}</p>
   if (state === 'error' || !data) return <p className="callout callout-error" role="alert">{t('reveal.loadError')}</p>
 

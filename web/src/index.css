@@ -255,3 +255,26 @@ h3 {
     animation: none;
   }
 }
+
+/* Loading state: swinging ornament */
+.ld-size {
+  width: clamp(44px, 11vmin, 90px);
+  height: auto;
+}
+.ld-swing {
+  transform-origin: 50% 0;
+  animation: ld-swing 1.8s ease-in-out infinite alternate;
+}
+@keyframes ld-swing {
+  from {
+    transform: rotate(-14deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ld-swing {
+    animation: none;
+  }
+}
